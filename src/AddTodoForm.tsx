@@ -94,6 +94,7 @@ export default class extends React.Component<IProps, IState> {
         // オプションボタン
         const optionBtnElement = (
             <button
+                id={"add-todo-option-btn-" + this.props.listId}
                 className={"add-todo-option-btn"}
                 onClick={() => {
                     this.props.changeOverViewMode(overViewMode.ADD_MENU, this.props.listId, "");

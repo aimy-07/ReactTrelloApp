@@ -215,12 +215,6 @@ class List extends React.Component<IProps> {
             </button>
         )
 
-        // 追加フォームのエリア
-        // const addTodoFromArea = (
-        //     <div className={"add-todo-from-area"}
-        //         id={"add-todo-form-" + this.props.list.id}
-        //         />
-        // )
 
         return(
             <div className={"list-container"}>
@@ -238,7 +232,6 @@ class List extends React.Component<IProps> {
                         changeOverViewMode={this.props.changeOverViewMode}
                         dispatch={this.props.dispatch}
                         />
-                //  ?  addTodoFromArea
                  :  addTodoBtn
                 }
             </div>

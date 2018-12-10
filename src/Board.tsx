@@ -27,29 +27,15 @@ interface IProps {
     dispatch: Dispatch<AnyAction>;
 }
 
-interface IState {
-    isEdit: boolean;
-    editBoardId: string;
-}
 
-
-
-class Kanban extends React.Component<IProps, IState> {
+class Kanban extends React.Component<IProps> {
 
     constructor(props: IProps) {
         super(props);
         this.state = {
-            isEdit: false,
-            editBoardId: "",
+
         };
     }
-
-    // public shouldComponentUpdate = (nextProps: IProps) => {
-    //     if (nextProps.newTodo.listId === this.props.newTodo.listId) {
-    //         return false;
-    //     }
-    //     return true;
-    // }
 
 
     /* ---------------------------------

@@ -39,11 +39,7 @@ export interface IStoreState {
     todoData: {
         lists: IList[]
     };
-    newTodo: {
-        listId: string;
-        newText: string;
-        newLabel: string;
-    }
+    newTodo: INewTodo;
 }
 
 /* ---------------------------------
