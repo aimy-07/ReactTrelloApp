@@ -1,11 +1,11 @@
-/* tslint:disable:object-literal-sort-keys no-console jsx-no-lambda jsx-no-bind curly ordered-imports*/
+/* tslint:disable: no-console ordered-imports object-literal-sort-keys jsx-no-lambda jsx-no-bind curly*/
 
 import * as React from "react";
 import { DragSource, DropTarget } from "react-dnd";
 
-import { ITodo } from "./reducer";
-
-import { overViewMode } from './Page';
+import { Dispatch, AnyAction } from "redux";
+import * as actions from "./actions";
+import { ICard, POPUP_MODE } from "./reducer";
 
 
 
@@ -25,8 +25,8 @@ const dragSource = {
     beginDrag(dragProps: any) {
         console.log("log : カードをドラッグしました");
         return {
-            fromId: dragProps.todo.id,
-            fromListId: dragProps.listId,
+            fromCardIndex: dragProps.cardIndex,
+            fromListIndex: dragProps.listIndex,
         }
     },
     endDrag(props: any) {
@@ -62,12 +62,12 @@ const dropTarget: any = {
         if (monitor) {
             if (monitor.getItemType() === Types.CARD) {
                 console.log("log : カードをカードにドロップしました");
-                const fromId = monitor.getItem().fromId;
-                const fromListId = monitor.getItem().fromListId;
-                const toId = dropProps.todo.id;
-                const toListId = dropProps.listId;
-                if (toId !== fromId) {
-                    dropProps.moveTodoItem(fromId, toId, fromListId, toListId);
+                const fromCardIndex = monitor.getItem().fromCardIndex;
+                const fromListIndex = monitor.getItem().fromListIndex;
+                const toCardIndex = dropProps.cardIndex;
+                const toListIndex = dropProps.listIndex;
+                if (toCardIndex !== fromCardIndex || toListIndex !== fromListIndex) {
+                    dropProps.moveCard(fromCardIndex, toCardIndex, fromListIndex, toListIndex);
                 }
             }
         }
@@ -106,16 +106,16 @@ const DroppableCard = DropTarget(
     型宣言
 ---------------------------------- */
 interface IProps {
-    todo: ITodo;
-    listId: string;
-    moveTodoItem: (fromId: string, toId: string, fromListId: string, toListId: string) => void;
-    changeOverViewMode: (mode: number, listId: string, todoId: string) => void;
+    card: ICard;
+    cardIndex: number
+    listIndex: number;
+    moveCard: (fromCardIndex: number, toCardIndex: number, fromListIndex: number, toListIndex: number) => void;
+    dispatch: Dispatch<AnyAction>;
 }
 
 interface IState {
     isMouseOver: boolean;
 }
-
 
 
 
@@ -128,12 +128,16 @@ class Card extends React.Component<IProps, IState> {
         }
     }
 
-    public shouldComponentUpdate = (nextProps: any) => {
-        if (nextProps !== this.props) {
-            return false;
-        }
-        return true;
-    }
+    
+    /* ---------------------------------
+        Reactライフサイクル関数
+    ---------------------------------- */
+    // public shouldComponentUpdate = (nextProps: any) => {
+    //     if (nextProps !== this.props) {
+    //         return false;
+    //     }
+    //     return true;
+    // }
 
 
     public render(): JSX.Element {
@@ -149,12 +153,12 @@ class Card extends React.Component<IProps, IState> {
             </div>
         )
 
-        // ラベル */}
+        // ラベル
         const labelElement = (
-            this.props.todo.label !== ""
+            this.props.card.label !== ""
              ?  <div 
                     className={"card-label"}
-                    style={{backgroundColor: this.props.todo.label}}
+                    style={{backgroundColor: this.props.card.label}}
                 />
              :  null
         )
@@ -162,16 +166,21 @@ class Card extends React.Component<IProps, IState> {
         // テキスト
         const textElement = (
             <div className={"card-text"}>
-                {this.props.todo.text}
+                {this.props.card.text}
             </div>
         )
 
         return (
             <div
-                id={"card-" + this.props.todo.id}
+                id={"card-" + this.props.card.id}
                 className={"card"}
-                onClick={() => {
-                    this.props.changeOverViewMode(overViewMode.EDIT_TODO, this.props.listId, this.props.todo.id);
+                onClick={(e) => {
+                    e.stopPropagation();
+                    this.props.dispatch( actions.changePopupMode(POPUP_MODE.EDIT_CARD) );
+                    this.props.dispatch( actions.changeClickTarget({
+                        listIndex: this.props.listIndex,
+                        cardIndex: this.props.cardIndex
+                    }));
                 }}
                 onMouseOver={() => {
                     this.setState({

@@ -1,15 +1,14 @@
-/* tslint:disable:object-literal-sort-keys no-console no-shadowed-variable jsx-no-lambda jsx-no-bind curly ordered-imports*/
+/* tslint:disable: no-console ordered-imports object-literal-sort-keys jsx-no-lambda jsx-no-bind curly*/
 
 import * as React from "react";
-import { Dispatch, AnyAction } from "redux";
 import { DragSource, DropTarget } from "react-dnd";
 
+import { Dispatch, AnyAction } from "redux";
 import * as actions from "./actions";
-import { IList, INewTodo } from "./reducer";
+import { IList, INewCard, POPUP_MODE, IClickTarget, INewListTitle } from "./reducer";
 
 import DraggableCard from "./Card";
-import AddTodoForm from "./AddTodoForm";
-import { overViewMode } from './Page';
+import AddCardForm from "./AddCardForm";
 
 
 
@@ -29,7 +28,7 @@ const dragSource = {
     beginDrag(dragProps: any) {
         console.log("log : リストをドラッグしました");
         return {
-            fromListId: dragProps.list.id
+            fromListIndex: dragProps.listIndex
         }
     },
     endDrag(props: any) {
@@ -65,20 +64,20 @@ const dropTarget: any = {
         if (monitor) {
             if (monitor.getItemType() === Types.LIST) {
                 console.log("log : リストをリストにドロップしました");
-                const fromListId = monitor.getItem().fromListId;
-                const toListId = dropProps.list.id;
-                if (toListId !== fromListId) {
+                const fromListIndex = monitor.getItem().fromListIndex;
+                const toListIndex = dropProps.listIndex;
+                if (toListIndex !== fromListIndex) {
                     // 入れ替え処理
-                    dropProps.moveListItem(fromListId, toListId);
+                    dropProps.moveList(fromListIndex, toListIndex);
                 }
             } else if (monitor.getItemType() === Types.CARD) {
                 console.log("log : カードをリストにドロップしました");
-                const fromId = monitor.getItem().fromId;
-                const fromListId = monitor.getItem().fromListId;
-                const toListId = dropProps.list.id;
-                if (toListId !== fromListId) {
+                const fromCardIndex = monitor.getItem().fromCardIndex;
+                const fromListIndex = monitor.getItem().fromListIndex;
+                const toListIndex = dropProps.listIndex;
+                if (toListIndex !== fromListIndex) {
                     // 入れ替え処理
-                    dropProps.moveTodoItemToList(fromId, fromListId, toListId);
+                    dropProps.moveCardToList(fromCardIndex, fromListIndex, toListIndex);
                 }
             }
         }
@@ -118,22 +117,29 @@ const DroppableList = DropTarget(
 ---------------------------------- */
 interface IProps {
     list: IList;
-    newTodo: INewTodo;
-    addTargetListId: string;
-    moveListItem: (fromListId: string, toListId: string) => void;
-    moveTodoItemToList: (fromId: string, fromListId: string, toListId: string) => void;
-    overViewMode: number;
-    changeOverViewMode: (mode: number, listId: string, todoId: string) => void;
+    listIndex: number;
+    popupMode: number;
+    clickTarget: IClickTarget;
+    newCard: INewCard;
+    newListTitle: INewListTitle;
+    moveList: (fromListIndex: number, toListIndex: number) => void;
+    moveCardToList: (fromCardIndex: number, fromListIndex: number, toListIndex: number) => void;
+    moveCard: (fromCardIndex: number, toCardIndex: number, fromListIndex: number, toListIndex: number) => void;
     dispatch: Dispatch<AnyAction>;
 }
 
 
-class List extends React.Component<IProps> {
+interface IState {
+    newTitle: string;
+}
+
+
+class List extends React.Component<IProps, IState> {
 
     constructor(props: IProps) {
         super(props);
         this.state = {
-            
+            newTitle: this.props.list.title,
         };
     }
 
@@ -141,99 +147,155 @@ class List extends React.Component<IProps> {
     /* ---------------------------------
         Reactライフサイクル関数
     ---------------------------------- */
-    public shouldComponentUpdate = (nextProps: IProps) => {
-        if (nextProps !== this.props) {
-            return false;
-        }
-        return true;
-    }
-
+    // public shouldComponentUpdate = (nextProps: IProps) => {
+    //     if (nextProps !== this.props) {
+    //         return false;
+    //     }
+    //     return true;
+    // }
 
     /* ---------------------------------
         処理関数
     ---------------------------------- */
-    public moveTodoItem = (fromId: string, toId: string, fromListId: string, toListId: string) => {
-        this.props.dispatch( actions.moveTodoItem({fromId, toId, fromListId, toListId}) )
+    public updateListTitle = (listIndex: number, newTitle: string) => {
+        if (newTitle !== "") {
+            actions.updateListTitle(listIndex, newTitle);
+            this.props.dispatch( actions.resetNewListTitle(null) );
+            this.setState({
+                newTitle: "",
+            })
+        }
     }
 
-
+    
     /* ---------------------------------
         レンダリング関数
     ---------------------------------- */
     public render(): JSX.Element {
-        console.log(this.props.overViewMode);
-        console.log(this.props.addTargetListId);
-
-        // オプションボタン
-        const menuBtnElement = (
-            <button className={"add-todo-option-btn"}
-                id={"list-menu-btn-" + this.props.list.id}
-                style={{top: "0px", left: "228px"}}
-                onClick={() => {
-                    this.props.changeOverViewMode(overViewMode.LIST_MENU, this.props.list.id, "");
-                }}>
-                •••
+        // リストタイトル
+        const listTitleElement = (
+            <button
+                className={"list-title"}
+                id={"list-title-" + this.props.list.id}
+                onClick={(e) => {
+                    this.props.dispatch( actions.changeNewListTitle({
+                        listIndex: this.props.listIndex,
+                        newTitle: this.props.list.title,
+                    }) );
+                    this.setState({
+                        newTitle: this.props.list.title,
+                    })
+                    e.stopPropagation();
+                }}
+                >
+                {this.props.list.title}
             </button>
         )
 
-        // リストタイトル
-        const listTitleElement = (
-            <div style={{display: "flex"}}>
-                {menuBtnElement}
-                <button className={"list-title"}
-                    id={"list-title-" + this.props.list.id}
-                    onClick={() => {
-                        this.props.changeOverViewMode(overViewMode.EDIT_LIST_TITLE, this.props.list.id, "");
+        // リストタイトル編集
+        const editListTitleElement = (
+            <input
+                className={"list-title-input"}
+                value={this.state.newTitle}
+                onChange={(e) => {
+                    this.setState({
+                        newTitle: e.currentTarget.value
+                    })
+                }}
+                onBlur={(e) => {
+                    this.props.dispatch( actions.changeNewListTitle({
+                        listIndex: this.props.listIndex,
+                        newTitle: this.state.newTitle,
+                    }));
+                }}
+                onKeyDown={(e) => {
+                    if (e.keyCode === 13) {
+                        this.updateListTitle(this.props.listIndex, this.state.newTitle);
+                    }
+                }}
+                onClick={(e) => {
+                    e.stopPropagation();
+                }}
+            />
+        )
+
+        // オプションボタン
+        const menuBtnElement = (
+            <div className={"option-btn-container"}>
+                <button className={"option-btn"}
+                    id={"list-menu-option-btn-" + this.props.list.id}
+                    style={{top: "0px", left: "228px"}}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        this.props.dispatch( actions.changePopupMode(POPUP_MODE.LIST_MENU) );
+                        this.props.dispatch( actions.changeClickTarget({
+                            listIndex: this.props.listIndex,
+                            cardIndex: -1
+                       }));
                     }}>
-                    {this.props.list.title}
+                    •••
                 </button>
             </div>
         )
 
         // カード
-        const cardElement = (
-            this.props.list.todos.map((todo) => (
-                <DraggableCard
-                    key={"card-" + todo.id + "-" + todo.updateDate + Math.random()}
-                    todo={todo}
-                    listId={this.props.list.id}
-                    moveTodoItem={this.moveTodoItem}
-                    changeOverViewMode={this.props.changeOverViewMode}
-                />
-                )
-            )
+        const cardElements = (
+            this.props.list.cards !== undefined
+             ?  this.props.list.cards.map((card, i) => (
+                    <DraggableCard
+                        key={"card-" + card.id}
+                        card={card}
+                        cardIndex={i}
+                        listIndex={this.props.listIndex}
+                        moveCard={this.props.moveCard}
+                        dispatch={this.props.dispatch}
+                    />
+                ))
+             :  null
         )
 
         // カード追加ボタン
-        const addTodoBtn = (
+        const addCardBtn = (
             <button
-                className={"add-todo-btn-container"}
-                onClick={() => {
-                    this.props.dispatch( actions.updateNewTodo({listId: this.props.list.id, text: this.props.newTodo.newText, label: this.props.newTodo.newLabel}) );
+                className={"add-card-btn"}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    this.props.dispatch( actions.changeNewCard({
+                        listIndex: this.props.listIndex,
+                        newText: this.props.newCard.newText,
+                        newLabel: this.props.newCard.newLabel,
+                    }));
                 }}>
                 ＋ カードを追加
             </button>
         )
 
-
         return(
             <div className={"list-container"}>
                 <div className={"list"}>
                     {/* リストタイトル */}
-                    {listTitleElement}
-                    {/* リスト */}
-                    {cardElement}
+                    <div style={{display: "flex"}}>
+                        {menuBtnElement}
+                        {console.log(this.props.newListTitle.listIndex)}
+                        {this.props.newListTitle.listIndex === this.props.listIndex
+                         ?  editListTitleElement
+                         :  listTitleElement}
+                    </div>
+                    {/* カード一覧 */}
+                    {cardElements}
                 </div>
                 {/* 新規追加フォーム */}
-                {this.props.newTodo.listId === this.props.list.id
-                 ?  <AddTodoForm
+                {this.props.newCard.listIndex === this.props.listIndex
+                 ?  <AddCardForm
+                        listIndex={this.props.listIndex}
                         listId={this.props.list.id}
-                        newTodo={this.props.newTodo}
-                        changeOverViewMode={this.props.changeOverViewMode}
+                        cards={this.props.list.cards}
+                        newCard={this.props.newCard}
                         dispatch={this.props.dispatch}
                         />
-                 :  addTodoBtn
+                 :  addCardBtn
                 }
+                
             </div>
         )
     }

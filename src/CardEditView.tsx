@@ -1,14 +1,16 @@
-/* tslint:disable:object-literal-sort-keys ordered-imports jsx-no-lambda jsx-no-bind curly*/
+/* tslint:disable: no-console ordered-imports object-literal-sort-keys jsx-no-lambda jsx-no-bind curly*/
 
 import * as React from "react";
-import { Dispatch, AnyAction } from "redux";
 import TextareaAutosize from "react-textarea-autosize";
+// react-textarea-autosize デモサイト
+// https://andreypopp.github.io/react-textarea-autosize/
 
+import { Dispatch, AnyAction } from "redux";
 import * as actions from "./actions";
-import { ITodo } from "./reducer";
+import { ICard } from "./reducer";
 
-import { getElemPosition} from "./Page";
 import LabelList from "./LabelList";
+import getElementPosition from "./getElementPosition";
 
 
 
@@ -17,9 +19,10 @@ import LabelList from "./LabelList";
     型宣言
 ---------------------------------- */
 interface IProps {
-    editTodo: ITodo;
-    editListId: string;
-    closeOverView: () => void;
+    targetCard: ICard;
+    targetCardIndex: number;
+    targetListIndex: number;
+    cards: ICard[];
     dispatch: Dispatch<AnyAction>;
 }
 
@@ -30,13 +33,13 @@ interface IState {
 }
 
 
-class TodoEditView extends React.Component<IProps, IState> {
+class CardEditView extends React.Component<IProps, IState> {
 
     constructor(props: IProps) {
         super(props);
         this.state = {
-            newText: props.editTodo.text,
-            newLabel: props.editTodo.label,
+            newText: props.targetCard.text,
+            newLabel: props.targetCard.label,
             isLabelEdit: false,
         }
     }
@@ -48,8 +51,8 @@ class TodoEditView extends React.Component<IProps, IState> {
     public componentWillReceiveProps = (nextProps: IProps) => {
         if (nextProps !== this.props) {
             this.setState ({
-                newText: nextProps.editTodo.text,
-                newLabel: nextProps.editTodo.label,
+                newText: nextProps.targetCard.text,
+                newLabel: nextProps.targetCard.label,
             })
         }
     }
@@ -58,14 +61,18 @@ class TodoEditView extends React.Component<IProps, IState> {
     /* ---------------------------------
         処理関数
     ---------------------------------- */
-    public updateTodo = (listId: string, id: string, text: string, label: string) => {
-        this.props.dispatch( actions.updateTodo({listId, id, text, label}) );
-        this.props.closeOverView();
+    public updateCard = (text: string, label: string) => {
+        if (text !== "") {
+            actions.updateCard(this.props.targetListIndex, this.props.targetCardIndex, text, label);
+            this.props.dispatch( actions.resetPopupMode(null) );
+            this.props.dispatch( actions.resetClickTarget(null) );
+        }
     }
 
-    public deleteTodo = (listId: string, id: string) => {
-        this.props.dispatch( actions.deleteTodo({listId, id}) );
-        this.props.closeOverView();
+    public deleteCard = () => {
+        actions.deleteCard(this.props.targetListIndex, this.props.cards, this.props.targetCardIndex);
+        this.props.dispatch( actions.resetPopupMode(null) );
+        this.props.dispatch( actions.resetClickTarget(null) );
     }
 
     public updateLabel = (newLabel: string) => {
@@ -92,9 +99,9 @@ class TodoEditView extends React.Component<IProps, IState> {
         // 保存ボタン
         const saveBtnElement = (
             <button
-                className={"edit-todo-btn"}
+                className={"save-btn"}
                 onClick={(e) => {
-                    this.updateTodo(this.props.editListId, this.props.editTodo.id, this.state.newText, this.state.newLabel);
+                    this.updateCard(this.state.newText, this.state.newLabel);
                     this.setState({
                         newText: "",
                         newLabel: ""
@@ -109,7 +116,7 @@ class TodoEditView extends React.Component<IProps, IState> {
         // ラベル編集ボタン
         const editLabelBtnElement = (
             <button
-                id={"edit-side-label-btn-" + this.props.editTodo.id}
+                id={"edit-side-label-btn-" + this.props.targetCard.id}
                 className={"edit-side-btn"}
                 onClick={(e) => {
                     this.setState({
@@ -127,7 +134,7 @@ class TodoEditView extends React.Component<IProps, IState> {
             <button
                 className={"edit-side-btn"}
                 onClick={(e: any) => {
-                    this.deleteTodo(this.props.editListId, this.props.editTodo.id);
+                    this.deleteCard();
                     e.stopPropagation();
                 }}
                 >
@@ -138,7 +145,7 @@ class TodoEditView extends React.Component<IProps, IState> {
         // ラベル編集メニュー
         const editLabelView = (
             <div className={"option-menu-container"}
-                style={getElemPosition("edit-side-label-btn-" + this.props.editTodo.id, 0, 32)}
+                style={getElementPosition("edit-side-label-btn-" + this.props.targetCard.id, 0, 32)}
                 onClick={(e) => {
                     e.stopPropagation();
                 }}>
@@ -163,13 +170,8 @@ class TodoEditView extends React.Component<IProps, IState> {
         )
 
         return (
-            // 背景をクリックした時に保存するならコメントアウトを実行
-            // <div className={"over-view"}
-            //     onClick={() => {
-            //         this.updateTodo(this.props.editListId, this.props.editTodo.id, this.state.newText, this.state.newLabel);
-            //     }}>
             <div className={"edit-container"}
-                style={getElemPosition("card-" + this.props.editTodo.id, 0, 0)}>
+                style={getElementPosition("card-" + this.props.targetCard.id, 0, 0)}>
 
                 <div style={{display: "block"}}>
                     <div className={"edit-card"}
@@ -180,7 +182,7 @@ class TodoEditView extends React.Component<IProps, IState> {
                         {labelElement}
                         {/* テキストエリア */}
                         <TextareaAutosize
-                            className={"add-todo-input"}
+                            className={"card-input"}
                             value={this.state.newText}
                             onChange={(e) => {
                                 this.setState({
@@ -208,4 +210,4 @@ class TodoEditView extends React.Component<IProps, IState> {
 }
 
 
-export default TodoEditView;
+export default CardEditView;

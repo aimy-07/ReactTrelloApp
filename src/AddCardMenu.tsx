@@ -1,13 +1,14 @@
-/* tslint:disable:object-literal-sort-keys ordered-imports jsx-no-lambda jsx-no-bind curly no-console*/
+/* tslint:disable: no-console ordered-imports object-literal-sort-keys jsx-no-lambda jsx-no-bind curly*/
 
 import * as React from "react";
+
 import { Dispatch, AnyAction } from "redux";
-
 import * as actions from "./actions";
-import { INewTodo } from "./reducer";
+import { INewCard, IList } from "./reducer";
 
-import { getElemPosition } from "./Page";
 import LabelList from "./LabelList";
+import getElementPosition from "./getElementPosition";
+
 
 
 
@@ -15,9 +16,9 @@ import LabelList from "./LabelList";
     型宣言
 ---------------------------------- */
 interface IProps {
-    listId: string;
-    newTodo: INewTodo;
-    closeOverView: () => void;
+    targetList: IList;
+    targetListIndex: number;
+    newCard: INewCard;
     dispatch: Dispatch<AnyAction>;
 }
 
@@ -26,7 +27,7 @@ interface IState {
 }
 
 
-class AddTodoMenu extends React.Component<IProps, IState> {
+class AddCardMenu extends React.Component<IProps, IState> {
 
     constructor(props: IProps) {
         super(props);
@@ -40,11 +41,12 @@ class AddTodoMenu extends React.Component<IProps, IState> {
         処理関数
     ---------------------------------- */
     public updateNewLabel = (label: string) => {
-        this.props.dispatch( actions.updateNewTodo({listId: this.props.listId, text:this.props.newTodo.newText, label}) )
+        this.props.dispatch( actions.changeNewCard({listIndex: this.props.targetListIndex, newText:this.props.newCard.newText, newLabel: label}) );
     }
 
-    public cancelAddTodo = () => {
-        this.props.closeOverView();
+    public cancelAddCard = () => {
+        this.props.dispatch( actions.resetPopupMode(null) );
+        this.props.dispatch( actions.resetClickTarget(null) );
     }
 
 
@@ -56,7 +58,7 @@ class AddTodoMenu extends React.Component<IProps, IState> {
             <div style={{position: "absolute"}}>
                 <button className={"option-menu-cancel-btn"}
                     onClick={() => {
-                        this.cancelAddTodo();
+                        this.cancelAddCard();
                     }}>
                     ×
                 </button>
@@ -65,7 +67,7 @@ class AddTodoMenu extends React.Component<IProps, IState> {
 
         return (
             <div className={"option-menu-container"}
-                style={getElemPosition("add-todo-option-btn-" + this.props.listId, 0, 36)}
+                style={getElementPosition("add-card-option-btn-" + this.props.targetList.id, 0, 34)}
                 onClick={(e) => {
                     e.stopPropagation();
                 }}>
@@ -89,4 +91,4 @@ class AddTodoMenu extends React.Component<IProps, IState> {
     }
 }
 
-export default AddTodoMenu;
+export default AddCardMenu;

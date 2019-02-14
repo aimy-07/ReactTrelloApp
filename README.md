@@ -167,7 +167,7 @@ In the project directory, you can run:
 
 ### `npm start`
 
-Runs the app in the development mode.<br>
+Runs the app in the development popupMode.<br>
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.<br>
@@ -175,13 +175,13 @@ You will also see any lint errors in the console.
 
 ### `npm test`
 
-Launches the test runner in the interactive watch mode.<br>
+Launches the test runner in the interactive watch popupMode.<br>
 See the section about [running tests](#running-tests) for more information.
 
 ### `npm run build`
 
 Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+It correctly bundles React in production popupMode and optimizes the build for the best performance.
 
 The build is minified and the filenames include the hashes.<br>
 Your app is ready to be deployed!
@@ -883,7 +883,7 @@ in the environment inside a `<form>`:
 render() {
   return (
     <div>
-      <small>You are running this application in <b>{process.env.NODE_ENV}</b> mode.</small>
+      <small>You are running this application in <b>{process.env.NODE_ENV}</b> popupMode.</small>
       <form>
         <input type="hidden" defaultValue={process.env.REACT_APP_SECRET_CODE} />
       </form>
@@ -898,7 +898,7 @@ When you load the app in the browser and inspect the `<input>`, you will see its
 
 ```html
 <div>
-  <small>You are running this application in <b>development</b> mode.</small>
+  <small>You are running this application in <b>development</b> popupMode.</small>
   <form>
     <input type="hidden" value="abcdef" />
   </form>
@@ -1082,7 +1082,7 @@ This way, when you `fetch('/api/todos')` in development, the development server 
 Conveniently, this avoids [CORS issues](http://stackoverflow.com/questions/21854516/understanding-ajax-cors-and-security-considerations) and error messages like this in development:
 
 ```
-Fetch API cannot load http://localhost:4000/api/todos. No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://localhost:3000' is therefore not allowed access. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
+Fetch API cannot load http://localhost:4000/api/todos. No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://localhost:3000' is therefore not allowed access. If an opaque response serves your needs, set the request's popupMode to 'no-cors' to fetch the resource with CORS disabled.
 ```
 
 Keep in mind that `proxy` only has effect in development (with `npm start`), and it is up to you to ensure that URLs like `/api/todos` point to the right thing in production. You don’t have to use the `/api` prefix. Any unrecognized request without a `text/html` accept header will be redirected to the specified `proxy`.
@@ -1306,17 +1306,17 @@ We recommend to put the test files (or `__tests__` folders) next to the code the
 
 ### Command Line Interface
 
-When you run `npm test`, Jest will launch in the watch mode. Every time you save a file, it will re-run the tests, just like `npm start` recompiles the code.
+When you run `npm test`, Jest will launch in the watch popupMode. Every time you save a file, it will re-run the tests, just like `npm start` recompiles the code.
 
 The watcher includes an interactive command-line interface with the ability to run all tests, or focus on a search pattern. It is designed this way so that you can keep it open and enjoy fast re-runs. You can learn the commands from the “Watch Usage” note that the watcher prints after every run:
 
-![Jest watch mode](http://facebook.github.io/jest/img/blog/15-watch.gif)
+![Jest watch popupMode](http://facebook.github.io/jest/img/blog/15-watch.gif)
 
 ### Version Control Integration
 
 By default, when you run `npm test`, Jest will only run the tests related to files changed since the last commit. This is an optimization designed to make your tests run fast regardless of how many tests you have. However it assumes that you don’t often commit the code that doesn’t pass the tests.
 
-Jest will always explicitly mention that it only ran tests related to the files changed since the last commit. You can also press `a` in the watch mode to force Jest to run all tests.
+Jest will always explicitly mention that it only ran tests related to the files changed since the last commit. You can also press `a` in the watch popupMode to force Jest to run all tests.
 
 Jest will always run all tests on a [continuous integration](#continuous-integration) server or if the project is not inside a Git or Mercurial repository.
 
@@ -1714,7 +1714,7 @@ Usually, in an app, you have a lot of UI components, and each of them has many d
 For an example, a simple button component could have following states:
 
 * In a regular state, with a text label.
-* In the disabled mode.
+* In the disabled popupMode.
 * In a loading state.
 
 Usually, it’s hard to see these states without running a sample app or some examples.
@@ -2340,11 +2340,11 @@ Variable | Development | Production | Usage
 BROWSER | :white_check_mark: | :x: | By default, Create React App will open the default system browser, favoring Chrome on macOS. Specify a [browser](https://github.com/sindresorhus/opn#app) to override this behavior, or set it to `none` to disable it completely. If you need to customize the way the browser is launched, you can specify a node script instead. Any arguments passed to `npm start` will also be passed to this script, and the url where your app is served will be the last argument. Your script's file name must have the `.js` extension.
 HOST | :white_check_mark: | :x: | By default, the development web server binds to `localhost`. You may use this variable to specify a different host.
 PORT | :white_check_mark: | :x: | By default, the development web server will attempt to listen on port 3000 or prompt you to attempt the next available port. You may use this variable to specify a different port.
-HTTPS | :white_check_mark: | :x: | When set to `true`, Create React App will run the development server in `https` mode.
+HTTPS | :white_check_mark: | :x: | When set to `true`, Create React App will run the development server in `https` popupMode.
 PUBLIC_URL | :x: | :white_check_mark: | Create React App assumes your application is hosted at the serving web server's root or a subpath as specified in [`package.json` (`homepage`)](#building-for-relative-paths). Normally, Create React App ignores the hostname. You may use this variable to force assets to be referenced verbatim to the url you provide (hostname included). This may be particularly useful when using a CDN to host your application.
 CI | :large_orange_diamond: | :white_check_mark: | When set to `true`, Create React App treats warnings as failures in the build. It also makes the test runner non-watching. Most CIs set this flag by default.
 REACT_EDITOR | :white_check_mark: | :x: | When an app crashes in development, you will see an error overlay with clickable stack trace. When you click on it, Create React App will try to determine the editor you are using based on currently running processes, and open the relevant source file. You can [send a pull request to detect your editor of choice](https://github.com/facebookincubator/create-react-app/issues/2636). Setting this environment variable overrides the automatic detection. If you do it, make sure your systems [PATH](https://en.wikipedia.org/wiki/PATH_(variable)) environment variable points to your editor’s bin folder. You can also set it to `none` to disable it completely.
-CHOKIDAR_USEPOLLING | :white_check_mark: | :x: | When set to `true`, the watcher runs in polling mode, as necessary inside a VM. Use this option if `npm start` isn't detecting changes.
+CHOKIDAR_USEPOLLING | :white_check_mark: | :x: | When set to `true`, the watcher runs in polling popupMode, as necessary inside a VM. Use this option if `npm start` isn't detecting changes.
 GENERATE_SOURCEMAP | :x: | :white_check_mark: | When set to `false`, source maps are not generated for a production build. This solves OOM issues on some smaller machines.
 NODE_PATH | :white_check_mark: |  :white_check_mark: | Same as [`NODE_PATH` in Node.js](https://nodejs.org/api/modules.html#modules_loading_from_the_global_folders), but only relative folders are allowed. Can be handy for emulating a monorepo setup by setting `NODE_PATH=src`.
 
@@ -2360,7 +2360,7 @@ If this doesn’t happen, try one of the following workarounds:
 * Some editors like Vim and IntelliJ have a “safe write” feature that currently breaks the watcher. You will need to disable it. Follow the instructions in [“Adjusting Your Text Editor”](https://webpack.js.org/guides/development/#adjusting-your-text-editor).
 * If your project path contains parentheses, try moving the project to a path without them. This is caused by a [Webpack watcher bug](https://github.com/webpack/watchpack/issues/42).
 * On Linux and macOS, you might need to [tweak system settings](https://github.com/webpack/docs/wiki/troubleshooting#not-enough-watchers) to allow more watchers.
-* If the project runs inside a virtual machine such as (a Vagrant provisioned) VirtualBox, create an `.env` file in your project directory if it doesn’t exist, and add `CHOKIDAR_USEPOLLING=true` to it. This ensures that the next time you run `npm start`, the watcher uses the polling mode, as necessary inside a VM.
+* If the project runs inside a virtual machine such as (a Vagrant provisioned) VirtualBox, create an `.env` file in your project directory if it doesn’t exist, and add `CHOKIDAR_USEPOLLING=true` to it. This ensures that the next time you run `npm start`, the watcher uses the polling popupMode, as necessary inside a VM.
 
 If none of these solutions help please leave a comment [in this thread](https://github.com/facebookincubator/create-react-app/issues/659).
 

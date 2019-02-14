@@ -1,7 +1,7 @@
-/* tslint:disable:ordered-imports*/
+/* tslint:disable: no-console ordered-imports object-literal-sort-keys */
+
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
-
 import { IStoreState } from "./reducer";
 
 import Page from "./Page";

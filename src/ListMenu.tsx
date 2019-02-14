@@ -1,11 +1,13 @@
-/* tslint:disable:object-literal-sort-keys ordered-imports jsx-no-lambda jsx-no-bind curly no-console*/
+/* tslint:disable: no-console ordered-imports object-literal-sort-keys jsx-no-lambda jsx-no-bind curly*/
 
 import * as React from "react";
+
 import { Dispatch, AnyAction } from "redux";
-
 import * as actions from "./actions";
+import { IList } from './reducer';
 
-import { getElemPosition } from "./Page";
+import getElementPosition from "./getElementPosition";
+
 
 
 
@@ -13,13 +15,14 @@ import { getElemPosition } from "./Page";
     型宣言
 ---------------------------------- */
 interface IProps {
-    listId: string;
-    closeOverView: () => void;
+    targetList: IList;
+    targetListIndex: number;
+    lists: IList[];
     dispatch: Dispatch<AnyAction>;
 }
 
 
-class AddTodoMenu extends React.Component<IProps> {
+class AddCardMenu extends React.Component<IProps> {
 
     constructor(props: IProps) {
         super(props);
@@ -31,14 +34,16 @@ class AddTodoMenu extends React.Component<IProps> {
     /* ---------------------------------
         処理関数
     ---------------------------------- */
-    public deleteList = (listId: string) => {
-        this.props.dispatch( actions.deleteList(listId) )
-        this.props.closeOverView();
+    public deleteList = (listIndex: number) => {
+        actions.deleteList(this.props.lists, listIndex);
+        this.props.dispatch( actions.resetPopupMode(null) );
+        this.props.dispatch( actions.resetClickTarget(null) );
     }
 
-    public deleteAllTodo = (listId: string) => {
-        this.props.dispatch( actions.deleteAllTodo(listId) )
-        this.props.closeOverView();
+    public deleteAllCards = (listIndex: number) => {
+        actions.deleteAllCards(listIndex)
+        this.props.dispatch( actions.resetPopupMode(null) );
+        this.props.dispatch( actions.resetClickTarget(null) );
     }
 
 
@@ -46,11 +51,13 @@ class AddTodoMenu extends React.Component<IProps> {
         レンダリング関数
     ---------------------------------- */
     public render(): JSX.Element {
+        // ×ボタン
         const cancelBtn = (
             <div style={{position: "absolute"}}>
                 <button className={"option-menu-cancel-btn"}
                     onClick={() => {
-                        this.props.closeOverView()
+                        this.props.dispatch( actions.resetPopupMode(null) );
+                        this.props.dispatch( actions.resetClickTarget(null) );
                     }}>
                     ×
                 </button>
@@ -59,7 +66,7 @@ class AddTodoMenu extends React.Component<IProps> {
 
         return (
             <div className={"option-menu-container"}
-                style={getElemPosition("list-menu-btn-" + this.props.listId, 0, 36)}
+                style={getElementPosition("list-menu-option-btn-" + this.props.targetList.id, 0, 34)}
                 onClick={(e) => {
                     e.stopPropagation();
                 }}>
@@ -74,20 +81,19 @@ class AddTodoMenu extends React.Component<IProps> {
                 {/* メニューの中身 */}
                 <button className={"option-menu-btn"}
                     onClick={() => {
-                        this.deleteAllTodo(this.props.listId);
+                        this.deleteAllCards(this.props.targetListIndex);
                     }}>
                     このリストの全てのカードを削除
                 </button>
                 <button className={"option-menu-btn"}
                     onClick={() => {
-                        this.deleteList(this.props.listId);
+                        this.deleteList(this.props.targetListIndex);
                     }}>
                     このリストを削除
                 </button>
-
             </div>
         )
     }
 }
 
-export default AddTodoMenu;
+export default AddCardMenu;

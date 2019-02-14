@@ -1,41 +1,66 @@
-/* tslint:disable:object-literal-sort-keys ordered-imports jsx-no-lambda jsx-no-bind curly no-console*/
+/* tslint:disable: no-console ordered-imports object-literal-sort-keys jsx-no-lambda jsx-no-bind curly*/
 
 import * as React from "react";
-import { Dispatch, AnyAction } from "redux";
+import {firebaseDb} from './util/firebase';
 
-import { IStoreState, IList, ITodo } from "./reducer";
+import { Dispatch, AnyAction } from "redux";
+import * as actions from "./actions";
+import { IStoreState, POPUP_MODE } from "./reducer";
 
 import Board from "./Board";
-import TodoEditView from "./TodoEditView";
-import ListTitleEditView from "./ListTitleEditView";
-import AddTodoMenu from "./AddTodoMenu";
 import ListMenu from "./ListMenu";
-
-
-
-/* ---------------------------------
-    Enum
----------------------------------- */
-export const enum overViewMode {
-    NONE,
-    EDIT_TODO,
-    EDIT_LIST_TITLE,
-    LIST_MENU,
-    ADD_MENU,
-}
+import AddCardMenu from "./AddCardMenu";
+import CardEditView from "./CardEditView";
 
 /* ---------------------------------
-    エレメントの位置を取得
+    Firebase
 ---------------------------------- */
-export const getElemPosition = (elementId: string, dx: number,dy: number) => {
-    const element = document.getElementById(elementId) !== null ? document.getElementById(elementId) : null;
-    if (element === null) {
-        return;
-    } else {
-        const rect = element.getBoundingClientRect();
-        return {left: (rect.left + dx) + "px", top: (rect.top + dy) + "px"}
-    }
-}
+// データベース初期化
+// firebaseDb.ref('board').set({
+//         lists: [
+//             {
+//                 id: "list0",
+//                 title: "TODO",
+//                 createDate: "2019/2/11 12:04:45",
+//                 updateDate: "2019/2/11 12:04:45",
+//                 cards: [
+//                     {
+//                         id: "0000",
+//                         text: "タスク1",
+//                         label: "red",
+//                         createDate: "2019/2/11 12:25:51",
+//                         updateDate: "2019/2/11 12:25:51",
+//                     },
+//                     {
+//                         id: "0001",
+//                         text: "タスク2",
+//                         label: "blue",
+//                         createDate: "2019/2/11 12:26:35",
+//                         updateDate: "2019/2/11 12:26:35",
+//                     },
+//                 ],
+//             },
+//             {
+//                 id: "list1",
+//                 title: "DONE",
+//                 createDate: "2019/2/11 12:04:20",
+//                 updateDate: "2019/2/11 12:04:20",
+//                 cards: [
+//                     {
+//                         id: "0002",
+//                         text: "タスク3",
+//                         label: "red",
+//                         createDate: "2019/2/11 12:27:20",
+//                         updateDate: "2019/2/11 12:27:20",
+//                     },
+//                 ],
+//             },
+//         ]
+// });
+// 書き込み
+// set 指定ノード以下全体を更新
+// update 指定のノードのみを更新(ノード全体が置き換えられるのを回避)
+// push.set 指定ノードに新しいデータを追加(追加時に新規IDを自動割り振り。配列にはできないかも)
 
 
 
@@ -46,98 +71,79 @@ interface IProps extends IStoreState {
     dispatch: Dispatch<AnyAction>;
 }
 
-interface IState {
-    overViewMode: number;
-    targetListId: string;
-    targetTodoId: string;
-}
 
-
-class Page extends React.Component<IProps, IState> {
+class Page extends React.Component<IProps> {
 
     constructor(props: IProps) {
         super(props);
         this.state = {
-            overViewMode: overViewMode.NONE,
-            targetListId: "",
-            targetTodoId: "",
+
         };
     }
 
-    /* ---------------------------------
-        処理関数
-    ---------------------------------- */
-    public changeOverViewMode = (mode: number, listId: string, todoId: string) => {
-        this.setState({
-            overViewMode: mode,
-            targetListId: listId,
-            targetTodoId: todoId,
-        })
-    }
 
-    public closeOverView = () => {
-        this.setState({
-            overViewMode: overViewMode.NONE,
-            targetListId: "",
-            targetTodoId: "",
+    /* ---------------------------------
+        Reactライフサイクル関数
+    ---------------------------------- */
+    public async componentWillMount () {
+        // firebaseからデータ取得
+        await firebaseDb.ref('board/lists').on('value', snapshot => {
+            (async () => {
+                if (snapshot === null) {
+                    console.log('Error : Snapshot is Enpty.');
+                    return;
+                }
+                // console.log(snapshot.val());
+                this.props.dispatch( actions.loadBoardData({lists: snapshot.val()}) )
+            })();
         });
     }
-
 
 
     /* ---------------------------------
         OverView
     ---------------------------------- */
-    public renderOverView = () => {
+    public renderPopup = () => {
         // 非表示
-        if (this.state.overViewMode === overViewMode.NONE) {
+        if (this.props.popupMode === POPUP_MODE.NONE) {
             return null;
         }
 
-        const listIndex = this.props.todoData.lists.findIndex((list: IList) => list.id === this.state.targetListId);
-        const targetList = this.props.todoData.lists[listIndex];
-        // リストタイトル編集ビュー
-        if (this.state.overViewMode === overViewMode.EDIT_LIST_TITLE) {
-            return (
-                <ListTitleEditView
-                    editList={targetList}
-                    dispatch={this.props.dispatch}
-                    />
-            )
-        }
+        const targetListIndex = this.props.clickTarget.listIndex;
         // リストメニュー
-        if (this.state.overViewMode === overViewMode.LIST_MENU) {
+        if (this.props.popupMode === POPUP_MODE.LIST_MENU) {
             return (
                 <ListMenu
-                    listId={this.state.targetListId}
-                    closeOverView={this.closeOverView}
+                    targetList={this.props.board.lists[targetListIndex]}
+                    targetListIndex={targetListIndex}
+                    lists={this.props.board.lists}
                     dispatch={this.props.dispatch}
                     />
             );
         }
         // カード追加メニュー
-        if (this.state.overViewMode === overViewMode.ADD_MENU) {
+        if (this.props.popupMode === POPUP_MODE.ADD_CARD_MENU) {
             return (
-                <AddTodoMenu
-                    listId={this.state.targetListId}
-                    newTodo={this.props.newTodo}
-                    closeOverView={this.closeOverView}
+                <AddCardMenu
+                    targetList={this.props.board.lists[targetListIndex]}
+                    targetListIndex={targetListIndex}
+                    newCard={this.props.newCard}
                     dispatch={this.props.dispatch}
                     />
             );
         }
         
+        const targetCardIndex = this.props.clickTarget.cardIndex;
         // 編集ビュー
-        const todoIndex: number = this.props.todoData.lists[listIndex].todos.findIndex((todo: ITodo) => todo.id === this.state.targetTodoId);
-        const targetTodo = targetList.todos[todoIndex];
-        if (this.state.overViewMode === overViewMode.EDIT_TODO) {
+        if (this.props.popupMode === POPUP_MODE.EDIT_CARD) {
             return (
-                <TodoEditView
-                    editTodo={targetTodo}
-                    editListId={this.state.targetListId}
-                    closeOverView={this.closeOverView}
+                <CardEditView
+                    targetCard={this.props.board.lists[targetListIndex].cards[targetCardIndex]}
+                    targetCardIndex={targetCardIndex}
+                    targetListIndex={targetListIndex}
+                    cards={this.props.board.lists[targetListIndex].cards}
                     dispatch={this.props.dispatch}
-                />
+                    />
             );
         }
 
@@ -150,30 +156,55 @@ class Page extends React.Component<IProps, IState> {
     ---------------------------------- */
     public render(): JSX.Element {
         return (
-            <div>
-                <div className={"header"}>
+            <div
+                onClick={() => {
+                    console.log("背景");
+                    // カード追加フォームにテキストがあったら背景クリックで追加
+                    if (this.props.newCard.listIndex !== -1 && this.props.newCard.newText !== "") {
+                        const listIndex = this.props.newCard.listIndex;
+                        const cards = this.props.board.lists[listIndex].cards;
+                        actions.addCard(listIndex, cards, this.props.newCard.newText, this.props.newCard.newLabel);
+                    }
+                    // リストタイトルが空白でなければ背景クリックでリストタイトルを更新
+                    if (this.props.newListTitle.listIndex !== -1 && this.props.newListTitle.newTitle !== "") {
+                        const listIndex = this.props.newListTitle.listIndex;
+                        const newTitle = this.props.newListTitle.newTitle;
+                        actions.updateListTitle(listIndex, newTitle);
+                    }
+                    this.props.dispatch( actions.resetNewCard(null) );
+                    this.props.dispatch( actions.resetNewListTitle(null) );
+                    this.props.dispatch( actions.resetPopupMode(null) );
+                    this.props.dispatch( actions.resetClickTarget(null) );
+                }}
+                >
+                {/* ヘッダー */}
+                <div
+                    id={"header"}>
                     React Trello App
                 </div>
+                {/* ボード */}
                 <Board
-                    lists={this.props.todoData.lists}
-                    newTodo={this.props.newTodo}
-                    addTargetListId={this.state.targetListId}
-                    overViewMode={this.state.overViewMode}
-                    changeOverViewMode={this.changeOverViewMode}
+                    lists={this.props.board.lists}
+                    popupMode={this.props.popupMode}
+                    clickTarget={this.props.clickTarget}
+                    newCard={this.props.newCard}
+                    newListTitle={this.props.newListTitle}
                     dispatch={this.props.dispatch}
                     />
-                {/* 編集ビュー */}
-                {/* メニューウィンドウ */}
-                <div className={"over-view"}
+                {/* Overview */}
+                <div
                     id={"over-view"}
                     style={{
-                        display: this.state.overViewMode === overViewMode.NONE ? "none" : "block",
-                        backgroundColor: this.state.overViewMode === overViewMode.EDIT_TODO ? "rgba(0, 0, 0, 0.5)" : "transparent",
+                        display: this.props.popupMode === POPUP_MODE.NONE ? "none" : "block",
+                        backgroundColor: this.props.popupMode === POPUP_MODE.EDIT_CARD ? "rgba(0, 0, 0, 0.5)" : "transparent",
                     }}
-                    onClick={() => {
-                        this.closeOverView();
-                    }}>
-                    {this.renderOverView()}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        this.props.dispatch( actions.resetPopupMode(null) );
+                        this.props.dispatch( actions.resetClickTarget(null) );
+                    }}
+                    >
+                    {this.renderPopup()}
                 </div>
             </div>
         )

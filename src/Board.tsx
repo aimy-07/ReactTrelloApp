@@ -1,17 +1,15 @@
-/* tslint:disable:object-literal-sort-keys ordered-imports jsx-no-lambda jsx-no-bind curly no-console*/
+/* tslint:disable: no-console ordered-imports object-literal-sort-keys jsx-no-lambda jsx-no-bind curly*/
 
 import * as React from "react";
-import { Dispatch, AnyAction } from "redux";
 import { DragDropContext } from "react-dnd";
 import HTML5Backend from "react-dnd-html5-backend";
 
+import { Dispatch, AnyAction } from "redux";
 import * as actions from "./actions";
-import { INewTodo } from "./reducer";
-import { IList } from "./reducer";
+import { IList, IClickTarget, INewCard, INewListTitle } from "./reducer";
 
 import DraggableList from "./List";
 import AddListButton from "./AddListButton"
-// import { overViewMode } from './Page';
 
 
 
@@ -20,15 +18,15 @@ import AddListButton from "./AddListButton"
 ---------------------------------- */
 interface IProps {
     lists: IList[];
-    newTodo: INewTodo;
-    addTargetListId: string;
-    overViewMode: number;
-    changeOverViewMode: (mode: number, listId: string, todoId: string) => void;
+    popupMode: number;
+    clickTarget: IClickTarget;
+    newCard: INewCard;
+    newListTitle: INewListTitle;
     dispatch: Dispatch<AnyAction>;
 }
 
 
-class Kanban extends React.Component<IProps> {
+class Board extends React.Component<IProps> {
 
     constructor(props: IProps) {
         super(props);
@@ -41,12 +39,16 @@ class Kanban extends React.Component<IProps> {
     /* ---------------------------------
         処理関数
     ---------------------------------- */
-    public moveListItem = (fromListId: string, toListId: string) => {
-        this.props.dispatch( actions.moveListItem({fromListId, toListId}) )
+    public moveList = (fromListIndex: number, toListIndex: number) => {
+        actions.moveList(this.props.lists, fromListIndex, toListIndex);
     }
 
-    public moveTodoItemToList = (fromId: string, fromListId: string, toListId: string) => {
-        this.props.dispatch( actions.moveTodoItemToList({fromId, fromListId, toListId}) )
+    public moveCardToList = (fromCardIndex: number, fromListIndex: number, toListIndex: number) => {
+        actions.moveCardToList(this.props.lists, fromCardIndex, fromListIndex, toListIndex);
+    }
+
+    public moveCard = (fromCardIndex: number, toCardIndex: number, fromListIndex: number, toListIndex: number) => {
+        actions.moveCard(this.props.lists, fromCardIndex, toCardIndex, fromListIndex, toListIndex);
     }
 
 
@@ -55,30 +57,37 @@ class Kanban extends React.Component<IProps> {
     ---------------------------------- */
     public render(): JSX.Element {
         // リスト
-        const listElement = (
-            this.props.lists.map((list) => {
-                return (
-                    <DraggableList
-                        key={"list-" + list.id + "-" + list.updateDate + Math.random()}
-                        list={list}
-                        newTodo={this.props.newTodo}
-                        addTargetListId={this.props.addTargetListId}
-                        moveListItem={this.moveListItem}
-                        moveTodoItemToList={this.moveTodoItemToList}
-                        overViewMode={this.props.overViewMode}
-                        changeOverViewMode={this.props.changeOverViewMode}
-                        dispatch={this.props.dispatch}
-                    />
-                )
-            })
+        const listElements = (
+            this.props.lists !== []
+             ?  this.props.lists.map((list, i) => {
+                    return (
+                        <DraggableList
+                            key={"list-" + list.id}
+                            list={list}
+                            listIndex={i}
+                            popupMode={this.props.popupMode}
+                            clickTarget={this.props.clickTarget}
+                            newCard={this.props.newCard}
+                            newListTitle={this.props.newListTitle}
+                            moveList={this.moveList}
+                            moveCardToList={this.moveCardToList}
+                            moveCard={this.moveCard}
+                            dispatch={this.props.dispatch}
+                        />
+                    )
+                })
+             :  null
         )
 
         return (
-            <div id={"kanban"}>
+            <div
+                id={"board"}>
                 {/* Listコンポーネント */}
-                {listElement}
+                {listElements}
                 {/* リスト追加ボタン */}
                 <AddListButton
+                    lists={this.props.lists}
+                    newListTitle={this.props.newListTitle}
                     dispatch={this.props.dispatch}
                     />
             </div>
@@ -86,4 +95,4 @@ class Kanban extends React.Component<IProps> {
     }
 }
 
-export default DragDropContext(HTML5Backend)(Kanban);
+export default DragDropContext(HTML5Backend)(Board);

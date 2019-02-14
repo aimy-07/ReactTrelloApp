@@ -6,7 +6,7 @@
 // will only see deployed updates on the 'N+1' visit to a page, since previously
 // cached resources are updated in the background.
 
-// To learn more about the benefits of this model, read https://goo.gl/KwvDNy.
+// To learn more about the benefits of this popupModel, read https://goo.gl/KwvDNy.
 // This link also includes instructions on opting out of this behavior.
 
 const isLocalhost = Boolean(
@@ -109,7 +109,7 @@ function checkValidServiceWorker(swUrl: string) {
     })
     .catch(() => {
       console.log(
-        'No internet connection found. App is running in offline mode.'
+        'No internet connection found. App is running in offline popupMode.'
       );
     });
 }
