@@ -1,9 +1,7 @@
-/* tslint:disable: no-console ordered-imports object-literal-sort-keys jsx-no-lambda jsx-no-bind curly*/
+import * as React from 'react';
 
-import * as React from "react";
-
-import { Dispatch, AnyAction } from "redux";
-import * as actions from "./actions";
+import { Dispatch, AnyAction } from 'redux';
+import * as actions from './actions';
 import { IList, INewListTitle } from './reducer';
 
 
@@ -26,7 +24,7 @@ class AddListButton extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            newTitle: ""
+            newTitle: '',
         };
     }
 
@@ -35,17 +33,17 @@ class AddListButton extends React.Component<IProps, IState> {
         処理関数
     ---------------------------------- */
     public addList = (title: string) => {
-        if (title !== "") {
+        if (title !== '') {
             actions.addList(this.props.lists, title);
             this.cancelAddList();
         }
     }
 
     public cancelAddList = () => {
-        this.props.dispatch( actions.resetNewListTitle(null) );
+        this.props.dispatch(actions.resetNewListTitle(null));
         this.setState({
-            newTitle: "",
-        })
+            newTitle: '',
+        });
     }
 
 
@@ -55,61 +53,61 @@ class AddListButton extends React.Component<IProps, IState> {
     public render(): JSX.Element {
         // 追加ボタン
         const addBtnElement = (
-            <button className={"save-btn"}
+            <button className={'save-btn'}
                 onClick={() => {
                     this.addList(this.state.newTitle);
                 }}>
                 リストを追加
             </button>
-        )
+        );
 
         // キャンセルボタン
         const cancelBtnElement = (
-            <button className={"cancel-btn"}
+            <button className={'cancel-btn'}
                 onClick={() => {
                     this.cancelAddList();
                 }}>
                 ×
             </button>
-        )
+        );
 
         return (
-            <div className={"list-conatiner"}>
+            <div className={'list-conatiner'}>
                 {this.props.newListTitle.listIndex !== this.props.lists.length
-                 ?  <button className={"add-list-btn"}
+                 ?  <button className={'add-list-btn'}
                         onClick={(e) => {
-                            this.props.dispatch( actions.changeNewListTitle({
+                            this.props.dispatch(actions.changeNewListTitle({
                                 listIndex: this.props.lists.length,
-                                newTitle: "",
+                                newTitle: '',
                             }));
                             this.setState({
-                                newTitle: "",
-                            })
+                                newTitle: '',
+                            });
                             e.stopPropagation();
                         }}
                         >
                         ＋ もう一つリストを追加
                     </button>
-                 :  <div className={"add-list-form-container"}
+                 :  <div className={'add-list-form-container'}
                         onClick={(e) => {
                             e.stopPropagation();
                         }}>
-                        <input className={"add-list-form-input"}
+                        <input className={'add-list-form-input'}
                             value={this.state.newTitle}
                             onChange={(e) => {
                                 this.setState({
-                                    newTitle: e.currentTarget.value
-                                })
+                                    newTitle: e.currentTarget.value,
+                                });
                             }}
                             onBlur={(e) => {
-                                this.props.dispatch( actions.changeNewListTitle({
+                                this.props.dispatch(actions.changeNewListTitle({
                                     listIndex: this.props.lists.length,
                                     newTitle: this.state.newTitle,
                                 }));
                             }}
                             onKeyDown={(e) => {
                                 if (e.keyCode === 13) {
-                                    this.addList(this.state.newTitle)
+                                    this.addList(this.state.newTitle);
                                 }
                             }}
                             onClick={(e) => {
@@ -117,14 +115,14 @@ class AddListButton extends React.Component<IProps, IState> {
                             }}
                             />
                         {/* ボタン群 */}
-                        <div className={"add-list-form-btns-container"}>
+                        <div className={'add-list-form-btns-container'}>
                             {addBtnElement}
                             {cancelBtnElement}
                         </div>
                     </div>
                 }
             </div>
-        )
+        );
     }
 }
 

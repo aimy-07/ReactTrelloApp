@@ -1,9 +1,7 @@
-/* tslint:disable: no-console ordered-imports object-literal-sort-keys */
+import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
-import { reducerWithInitialState } from "typescript-fsa-reducers";
-
-import * as actions from "./actions";
-
+import * as actions from './actions';
+import * as firebase from 'firebase/app';
 
 
 /* ---------------------------------
@@ -36,14 +34,20 @@ export interface IBoard {
 }
 
 /* ---------------------------------
-    Enum popupMode
+    Enums
 ---------------------------------- */
 export const POPUP_MODE = {
     NONE: 0,
     EDIT_CARD: 1,
     ADD_CARD_MENU: 2,
     LIST_MENU: 3,
-}
+};
+
+export const PAGES = {
+    LOGIN: 0,
+    CREATE_ACCOUNT: 1,
+    BOARD: 2,
+};
 
 /* ---------------------------------
     ClickTargetの型
@@ -75,6 +79,8 @@ export interface IStoreState {
     clickTarget: IClickTarget;
     newCard: INewCard;
     newListTitle: INewListTitle;
+    currentPage: number;
+    currentUser: firebase.User | null;
 }
 
 /* ---------------------------------
@@ -91,13 +97,15 @@ export const initialStoreState: IStoreState = {
     },
     newCard: {
         listIndex: -1,
-        newText: "",
-        newLabel: "",
+        newText: '',
+        newLabel: '',
     },
     newListTitle: {
         listIndex: -1,
-        newTitle: "",
+        newTitle: '',
     },
+    currentPage: PAGES.LOGIN,
+    currentUser: null,
 };
 
 
@@ -110,32 +118,32 @@ export default reducerWithInitialState(initialStoreState)
     .case(actions.loadBoardData, (state: IStoreState, payload) => {
         return {
             ...state,
-            board: payload
-        }
+            board: payload,
+        };
     })
 
     // popupModeの変更
     .case(actions.changePopupMode, (state: IStoreState, payload) => {
         return {
             ...state,
-            popupMode: payload
-        }
+            popupMode: payload,
+        };
     })
 
     // popupModeのリセット
     .case(actions.resetPopupMode, (state: IStoreState) => {
         return {
             ...state,
-            popupMode: POPUP_MODE.NONE
-        }
+            popupMode: POPUP_MODE.NONE,
+        };
     })
 
     // Targetの変更
     .case(actions.changeClickTarget, (state: IStoreState, payload) => {
         return {
             ...state,
-            clickTarget: payload
-        }
+            clickTarget: payload,
+        };
     })
 
     // Targetリセット
@@ -146,7 +154,7 @@ export default reducerWithInitialState(initialStoreState)
                 listIndex: -1,
                 cardIndex: -1,
             },
-        }
+        };
     })
 
     // NewCardの変更
@@ -154,7 +162,7 @@ export default reducerWithInitialState(initialStoreState)
         return {
             ...state,
             newCard: payload,
-        }
+        };
     })
 
     // NewCardのリセット
@@ -163,10 +171,10 @@ export default reducerWithInitialState(initialStoreState)
             ...state,
             newCard: {
                 listIndex: -1,
-                newText: "",
-                newLabel: "",
-            }
-        }
+                newText: '',
+                newLabel: '',
+            },
+        };
     })
 
     // NewListTitleの変更
@@ -174,7 +182,7 @@ export default reducerWithInitialState(initialStoreState)
         return {
             ...state,
             newListTitle: payload,
-        }
+        };
     })
 
     // NewListTitleのリセット
@@ -183,9 +191,25 @@ export default reducerWithInitialState(initialStoreState)
             ...state,
             newListTitle: {
                 listIndex: -1,
-                newTitle: "",
-            }
-        }
+                newTitle: '',
+            },
+        };
+    })
+
+    // Pageの変更
+    .case(actions.changePage, (state: IStoreState, payload) => {
+        return {
+            ...state,
+            currentPage: payload,
+        };
+    })
+
+    // Userの変更
+    .case(actions.changeUser, (state: IStoreState, payload) => {
+        return {
+            ...state,
+            currentUser: payload,
+        };
     })
 
     .build();

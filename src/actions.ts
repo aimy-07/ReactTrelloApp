@@ -1,14 +1,13 @@
-/* tslint:disable: no-console ordered-imports object-literal-sort-keys */
-
-import actionCreatorFactory from "typescript-fsa";
+import actionCreatorFactory from 'typescript-fsa';
 const actionCreator = actionCreatorFactory();
 
 /* ---------------------------------
-   Firebaseへの変更要請は全てここから行う 
+   Firebaseへの変更要請は全てここから行う
 ---------------------------------- */
 import { firebaseDb } from './util/firebase';
-import { IBoard, IList, ICard, } from "./reducer";
-import * as uuidv4 from "uuid/v4";
+import * as firebase from 'firebase/app';
+import { IBoard, IList, ICard } from './reducer';
+import * as uuidv4 from 'uuid/v4';
 
 
 
@@ -16,19 +15,19 @@ import * as uuidv4 from "uuid/v4";
    Local Action
 ---------------------------------- */
 export const changePopupMode = actionCreator<number>(
-    "CHANGE_POPUP_MODE",
+    'CHANGE_POPUP_MODE',
 );
 
 export const resetPopupMode = actionCreator<null>(
-    "RESET_POPUP_MODE",
+    'RESET_POPUP_MODE',
 );
 
 export const changeClickTarget = actionCreator<{listIndex: number, cardIndex: number}>(
-    "CHANGE_CLICK_TARGET",
+    'CHANGE_CLICK_TARGET',
 );
 
 export const resetClickTarget = actionCreator<null>(
-    "RESET_CLICK_TARGET",
+    'RESET_CLICK_TARGET',
 );
 
 export const changeNewCard = actionCreator<{listIndex: number, newText:string, newLabel:string}>(
@@ -47,6 +46,14 @@ export const resetNewListTitle = actionCreator<null>(
     'RESET_NEW_LIST_TITLE',
 );
 
+export const changePage = actionCreator<number>(
+    'CHANGE_PAGE',
+);
+
+export const changeUser = actionCreator<firebase.User | null>(
+    'CHANGE_USER',
+);
+
 
 
 /* ---------------------------------
@@ -54,14 +61,14 @@ export const resetNewListTitle = actionCreator<null>(
 ---------------------------------- */
 // Firebaseロード
 export const loadBoardData = actionCreator<IBoard>(
-    "LOAD_BOARD_DATA",
+    'LOAD_BOARD_DATA',
 );
 
 // カードの追加
 export const addCard = (listIndex: number, cards: ICard[], text: string, label:string) => {
     const date = new Date().toLocaleString();
     if (cards === undefined) {
-        cards = []
+        cards = [];
     }
     firebaseDb.ref('board/lists/' + listIndex + '/cards').set(cards.concat({
         id: uuidv4(),
@@ -71,22 +78,22 @@ export const addCard = (listIndex: number, cards: ICard[], text: string, label:s
         updateDate: date,
     }))
         .catch((error:Error) => {
-            console.log("Error : Add card error.");
+            console.log('Error : Add card error.');
         });
-}
+};
 
 // カードの編集
 export const updateCard = (listIndex: number, cardIndex: number, text:string, label: string) => {
     const date = new Date().toLocaleString();
     firebaseDb.ref('board/lists/' + listIndex + '/cards/' + cardIndex).update({
-        "text": text,
-        "label": label,
-        "updateDate": date,
-      })
+        'text': text,
+        'label': label,
+        'updateDate': date,
+    })
         .catch((error:Error) => {
-            console.log("Error : Update card error.");
+            console.log('Error : Update card error.');
         });
-}
+};
 
 // カードの削除
 export const deleteCard = (listIndex: number, cards: ICard[], cardIndex: number) => {
@@ -94,13 +101,13 @@ export const deleteCard = (listIndex: number, cards: ICard[], cardIndex: number)
     newCards.splice(cardIndex, 1);
     const date = new Date().toLocaleString();
     firebaseDb.ref('board/lists/' + listIndex + '/').update({
-        "cards": newCards,
-        "updateDate": date,
+        'cards': newCards,
+        'updateDate': date,
     })
         .catch((error:Error) => {
-            console.log("Error : Delete card error.");
+            console.log('Error : Delete card error.');
         });
-}
+};
 
 // カード同士の移動
 export const moveCard = (lists: IList[], fromCardIndex: number, toCardIndex: number, fromListIndex: number, toListIndex: number) => {
@@ -121,12 +128,12 @@ export const moveCard = (lists: IList[], fromCardIndex: number, toCardIndex: num
         newLists[toListIndex].cards = newCards;
     }
     firebaseDb.ref('board/lists/').set(
-        newLists
+        newLists,
     )
         .catch((error:Error) => {
-            console.log("Error : Move card to list error.");
+            console.log('Error : Move card to list error.');
         });
-}
+};
 
 // カードをリストに移動
 export const moveCardToList = (lists: IList[], fromCardIndex: number, fromListIndex: number, toListIndex: number) => {
@@ -138,12 +145,12 @@ export const moveCardToList = (lists: IList[], fromCardIndex: number, fromListIn
     const newCards = newLists[toListIndex].cards.concat(movedCard);
     newLists[toListIndex].cards = newCards;
     firebaseDb.ref('board/lists/').set(
-        newLists
+        newLists,
     )
         .catch((error:Error) => {
-            console.log("Error : Move card to list error.");
+            console.log('Error : Move card to list error.');
         });
-}
+};
 
 // リストの追加
 export const addList = (lists: IList[], title: string) => {
@@ -156,45 +163,45 @@ export const addList = (lists: IList[], title: string) => {
         cards: [],
     }))
         .catch((error:Error) => {
-            console.log("Error : Add list error.");
+            console.log('Error : Add list error.');
         });
-}
+};
 
 // リストタイトルの編集
 export const updateListTitle = (listIndex: number, title:string) => {
     const date = new Date().toLocaleString();
     firebaseDb.ref('board/lists/' + listIndex + '/').update({
-        "title": title,
-        "updateDate": date,
-      })
+        'title': title,
+        'updateDate': date,
+    })
         .catch((error:Error) => {
-            console.log("Error : Update list title error.");
+            console.log('Error : Update list title error.');
         });
-}
+};
 
 // リストの削除
 export const deleteList = (lists: IList[], listIndex: number) => {
     const newLists = lists.concat();
     newLists.splice(listIndex, 1);
     firebaseDb.ref('board/').update({
-        "lists": newLists,
+        'lists': newLists,
     })
         .catch((error:Error) => {
-            console.log("Error : Delete list error.");
+            console.log('Error : Delete list error.');
         });
-}
+};
 
 // リスト内の全てのカードを削除
 export const deleteAllCards = (listIndex: number) => {
     const date = new Date().toLocaleString();
     firebaseDb.ref('board/lists/' + listIndex + '/').update({
-        "cards": null,
-        "updateDate": date,
+        'cards': null,
+        'updateDate': date,
     })
         .catch((error:Error) => {
-            console.log("Error : Delete all cards error.");
+            console.log('Error : Delete all cards error.');
         });
-}
+};
 
 // リスト同士の移動
 export const moveList = (lists: IList[], fromListIndex: number, toListIndex: number) => {
@@ -203,9 +210,22 @@ export const moveList = (lists: IList[], fromListIndex: number, toListIndex: num
     newLists[fromListIndex] = newLists[toListIndex];
     newLists[toListIndex] = tmpList;
     firebaseDb.ref('board/lists/').set(
-        newLists
+        newLists,
     )
         .catch((error:Error) => {
-            console.log("Error : Move list error.");
+            console.log('Error : Move list error.');
         });
-}
+};
+
+
+
+// export const addUser = (user: firebase.User | null) => {
+//     if (user === null)  return;
+//     console.log('aaa')
+//     firebaseDb.ref('users/' + user.uid).set({
+//         uid: user.uid,
+//     })
+//         .catch((error:Error) => {
+//             console.log('Error : Add User Error.');
+//         });
+// };

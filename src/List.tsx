@@ -1,14 +1,15 @@
-/* tslint:disable: no-console ordered-imports object-literal-sort-keys jsx-no-lambda jsx-no-bind curly*/
+// 変数名をチェックしない
+/* tslint:disable: variable-name */
 
-import * as React from "react";
-import { DragSource, DropTarget } from "react-dnd";
+import * as React from 'react';
+import { DragSource, DropTarget } from 'react-dnd';
 
-import { Dispatch, AnyAction } from "redux";
-import * as actions from "./actions";
-import { IList, INewCard, POPUP_MODE, IClickTarget, INewListTitle } from "./reducer";
+import { Dispatch, AnyAction } from 'redux';
+import * as actions from './actions';
+import { IList, INewCard, POPUP_MODE, IClickTarget, INewListTitle } from './reducer';
 
-import DraggableCard from "./Card";
-import AddCardForm from "./AddCardForm";
+import DraggableCard from './Card';
+import AddCardForm from './AddCardForm';
 
 
 
@@ -26,23 +27,23 @@ const Types = {
 ---------------------------------- */
 const dragSource = {
     beginDrag(dragProps: any) {
-        console.log("log : リストをドラッグしました");
+        console.log('log : リストをドラッグしました');
         return {
-            fromListIndex: dragProps.listIndex
-        }
+            fromListIndex: dragProps.listIndex,
+        };
     },
     endDrag(props: any) {
-        return {}
-    }
+        return {};
+    },
 };
 
 const ConnectedSource = (props: any) => {
     return props.connectDragSource(
         <div>
             <DroppableList {...props}/>
-        </div>
-    )
-}
+        </div>,
+    );
+};
 
 const DraggableList = DragSource(
     Types.LIST,
@@ -50,9 +51,9 @@ const DraggableList = DragSource(
     (connect, monitor) => {
         return {
             connectDragSource: connect.dragSource(),
-            isDragging: monitor.isDragging()
-        }
-    }
+            isDragging: monitor.isDragging(),
+        };
+    },
 )(ConnectedSource);
 
 
@@ -63,7 +64,7 @@ const dropTarget: any = {
     drop(dropProps: any, monitor: any) {
         if (monitor) {
             if (monitor.getItemType() === Types.LIST) {
-                console.log("log : リストをリストにドロップしました");
+                console.log('log : リストをリストにドロップしました');
                 const fromListIndex = monitor.getItem().fromListIndex;
                 const toListIndex = dropProps.listIndex;
                 if (toListIndex !== fromListIndex) {
@@ -71,7 +72,7 @@ const dropTarget: any = {
                     dropProps.moveList(fromListIndex, toListIndex);
                 }
             } else if (monitor.getItemType() === Types.CARD) {
-                console.log("log : カードをリストにドロップしました");
+                console.log('log : カードをリストにドロップしました');
                 const fromCardIndex = monitor.getItem().fromCardIndex;
                 const fromListIndex = monitor.getItem().fromListIndex;
                 const toListIndex = dropProps.listIndex;
@@ -88,16 +89,16 @@ const dropTarget: any = {
     },
     canDrop(props: any, monitor: any) {
         return {};
-    }
+    },
 };
 
 const ConnectedTarget = (props: any) => {
     return props.connectDropTarget(
         <div>
             <List {...props}/>
-        </div>
-    )
-}
+        </div>,
+    );
+};
 
 const DroppableList = DropTarget(
     [Types.LIST, Types.CARD],
@@ -105,11 +106,10 @@ const DroppableList = DropTarget(
     (connect: any, monitor: any) => {
         return {
             connectDropTarget: connect.dropTarget(),
-            canDrop: monitor.canDrop()
-        }
-    }
+            canDrop: monitor.canDrop(),
+        };
+    },
 )(ConnectedTarget);
-
 
 
 /* ---------------------------------
@@ -158,16 +158,16 @@ class List extends React.Component<IProps, IState> {
         処理関数
     ---------------------------------- */
     public updateListTitle = (listIndex: number, newTitle: string) => {
-        if (newTitle !== "") {
+        if (newTitle !== '') {
             actions.updateListTitle(listIndex, newTitle);
-            this.props.dispatch( actions.resetNewListTitle(null) );
+            this.props.dispatch(actions.resetNewListTitle(null));
             this.setState({
-                newTitle: "",
-            })
+                newTitle: '',
+            });
         }
     }
 
-    
+
     /* ---------------------------------
         レンダリング関数
     ---------------------------------- */
@@ -175,35 +175,35 @@ class List extends React.Component<IProps, IState> {
         // リストタイトル
         const listTitleElement = (
             <button
-                className={"list-title"}
-                id={"list-title-" + this.props.list.id}
+                className={'list-title'}
+                id={'list-title-' + this.props.list.id}
                 onClick={(e) => {
-                    this.props.dispatch( actions.changeNewListTitle({
+                    this.props.dispatch(actions.changeNewListTitle({
                         listIndex: this.props.listIndex,
                         newTitle: this.props.list.title,
-                    }) );
+                    }));
                     this.setState({
                         newTitle: this.props.list.title,
-                    })
+                    });
                     e.stopPropagation();
                 }}
                 >
                 {this.props.list.title}
             </button>
-        )
+        );
 
         // リストタイトル編集
         const editListTitleElement = (
             <input
-                className={"list-title-input"}
+                className={'list-title-input'}
                 value={this.state.newTitle}
                 onChange={(e) => {
                     this.setState({
-                        newTitle: e.currentTarget.value
-                    })
+                        newTitle: e.currentTarget.value,
+                    });
                 }}
                 onBlur={(e) => {
-                    this.props.dispatch( actions.changeNewListTitle({
+                    this.props.dispatch(actions.changeNewListTitle({
                         listIndex: this.props.listIndex,
                         newTitle: this.state.newTitle,
                     }));
@@ -217,33 +217,33 @@ class List extends React.Component<IProps, IState> {
                     e.stopPropagation();
                 }}
             />
-        )
+        );
 
         // オプションボタン
         const menuBtnElement = (
-            <div className={"option-btn-container"}>
-                <button className={"option-btn"}
-                    id={"list-menu-option-btn-" + this.props.list.id}
-                    style={{top: "0px", left: "228px"}}
+            <div className={'option-btn-container'}>
+                <button className={'option-btn'}
+                    id={'list-menu-option-btn-' + this.props.list.id}
+                    style={{ top: '0px', left: '228px' }}
                     onClick={(e) => {
                         e.stopPropagation();
-                        this.props.dispatch( actions.changePopupMode(POPUP_MODE.LIST_MENU) );
-                        this.props.dispatch( actions.changeClickTarget({
+                        this.props.dispatch(actions.changePopupMode(POPUP_MODE.LIST_MENU));
+                        this.props.dispatch(actions.changeClickTarget({
                             listIndex: this.props.listIndex,
-                            cardIndex: -1
-                       }));
+                            cardIndex: -1,
+                        }));
                     }}>
                     •••
                 </button>
             </div>
-        )
+        );
 
         // カード
         const cardElements = (
             this.props.list.cards !== undefined
              ?  this.props.list.cards.map((card, i) => (
                     <DraggableCard
-                        key={"card-" + card.id}
+                        key={'card-' + card.id}
                         card={card}
                         cardIndex={i}
                         listIndex={this.props.listIndex}
@@ -252,15 +252,15 @@ class List extends React.Component<IProps, IState> {
                     />
                 ))
              :  null
-        )
+        );
 
         // カード追加ボタン
         const addCardBtn = (
             <button
-                className={"add-card-btn"}
+                className={'add-card-btn'}
                 onClick={(e) => {
                     e.stopPropagation();
-                    this.props.dispatch( actions.changeNewCard({
+                    this.props.dispatch(actions.changeNewCard({
                         listIndex: this.props.listIndex,
                         newText: this.props.newCard.newText,
                         newLabel: this.props.newCard.newLabel,
@@ -268,13 +268,13 @@ class List extends React.Component<IProps, IState> {
                 }}>
                 ＋ カードを追加
             </button>
-        )
+        );
 
         return(
-            <div className={"list-container"}>
-                <div className={"list"}>
+            <div className={'list-container'}>
+                <div className={'list'}>
                     {/* リストタイトル */}
-                    <div style={{display: "flex"}}>
+                    <div style={{ display: 'flex' }}>
                         {menuBtnElement}
                         {console.log(this.props.newListTitle.listIndex)}
                         {this.props.newListTitle.listIndex === this.props.listIndex
@@ -295,9 +295,9 @@ class List extends React.Component<IProps, IState> {
                         />
                  :  addCardBtn
                 }
-                
+
             </div>
-        )
+        );
     }
 }
 

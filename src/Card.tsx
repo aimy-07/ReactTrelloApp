@@ -1,18 +1,19 @@
-/* tslint:disable: no-console ordered-imports object-literal-sort-keys jsx-no-lambda jsx-no-bind curly*/
+// 変数名をチェックしない
+/* tslint:disable: variable-name */
 
-import * as React from "react";
-import { DragSource, DropTarget } from "react-dnd";
+import * as React from 'react';
+import { DragSource, DropTarget } from 'react-dnd';
 
-import { Dispatch, AnyAction } from "redux";
-import * as actions from "./actions";
-import { ICard, POPUP_MODE } from "./reducer";
+import { Dispatch, AnyAction } from 'redux';
+import * as actions from './actions';
+import { ICard, POPUP_MODE } from './reducer';
 
 
 
 /* ---------------------------------
     DnD変数
 ---------------------------------- */
-const Types = {
+const TYPES = {
     CARD: 'card',
     LIST: 'list',
 };
@@ -23,35 +24,35 @@ const Types = {
 ---------------------------------- */
 const dragSource = {
     beginDrag(dragProps: any) {
-        console.log("log : カードをドラッグしました");
+        console.log('log : カードをドラッグしました');
         return {
             fromCardIndex: dragProps.cardIndex,
             fromListIndex: dragProps.listIndex,
-        }
+        };
     },
     endDrag(props: any) {
-        return {}
-    }
+        return {};
+    },
 };
 
-const ConnectedSource = (props: any) => {
+const connectedSource = (props: any) => {
     return props.connectDragSource(
         <div>
             <DroppableCard {...props}/>
-        </div>
-    )
-}
+        </div>,
+    );
+};
 
 const DraggableCard = DragSource(
-    Types.CARD,
+    TYPES.CARD,
     dragSource,
     (connect: any, monitor: any) => {
         return {
             connectDragSource: connect.dragSource(),
-            isDragging: monitor.isDragging()
-        }
-    }
-)(ConnectedSource);
+            isDragging: monitor.isDragging(),
+        };
+    },
+)(connectedSource);
 
 
 /* ---------------------------------
@@ -60,8 +61,8 @@ const DraggableCard = DragSource(
 const dropTarget: any = {
     drop(dropProps: any, monitor: any) {
         if (monitor) {
-            if (monitor.getItemType() === Types.CARD) {
-                console.log("log : カードをカードにドロップしました");
+            if (monitor.getItemType() === TYPES.CARD) {
+                console.log('log : カードをカードにドロップしました');
                 const fromCardIndex = monitor.getItem().fromCardIndex;
                 const fromListIndex = monitor.getItem().fromListIndex;
                 const toCardIndex = dropProps.cardIndex;
@@ -78,27 +79,27 @@ const dropTarget: any = {
     },
     canDrop(dropProps: any, monitor: any) {
         return {};
-    }
+    },
 };
 
-const ConnectedTarget = (props: any) => {
+const connectedTarget = (props: any) => {
     return props.connectDropTarget(
         <div>
             <Card {...props}/>
-        </div>
-    )
-}
+        </div>,
+    );
+};
 
 const DroppableCard = DropTarget(
-    Types.CARD,
+    TYPES.CARD,
     dropTarget,
     (connect: any, monitor: any) => {
         return {
             connectDropTarget: connect.dropTarget(),
-            canDrop: monitor.canDrop()
-        }
-    }
-)(ConnectedTarget);
+            canDrop: monitor.canDrop(),
+        };
+    },
+)(connectedTarget);
 
 
 
@@ -107,7 +108,7 @@ const DroppableCard = DropTarget(
 ---------------------------------- */
 interface IProps {
     card: ICard;
-    cardIndex: number
+    cardIndex: number;
     listIndex: number;
     moveCard: (fromCardIndex: number, toCardIndex: number, fromListIndex: number, toListIndex: number) => void;
     dispatch: Dispatch<AnyAction>;
@@ -124,11 +125,11 @@ class Card extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            isMouseOver: false
-        }
+            isMouseOver: false,
+        };
     }
 
-    
+
     /* ---------------------------------
         Reactライフサイクル関数
     ---------------------------------- */
@@ -143,54 +144,54 @@ class Card extends React.Component<IProps, IState> {
     public render(): JSX.Element {
         // 編集アイコン */}
         const editIconElement = (
-            <div style={{position: "relative"}}>
+            <div style={{ position: 'relative' }}>
                 {this.state.isMouseOver
-                 ?  <div className={"card-edit-icon"}>
+                 ?  <div className={'card-edit-icon'}>
                         =
                     </div>
                  :  null
                 }
             </div>
-        )
+        );
 
         // ラベル
         const labelElement = (
-            this.props.card.label !== ""
-             ?  <div 
-                    className={"card-label"}
-                    style={{backgroundColor: this.props.card.label}}
+            this.props.card.label !== ''
+             ?  <div
+                    className={'card-label'}
+                    style={{ backgroundColor: this.props.card.label }}
                 />
              :  null
-        )
+        );
 
         // テキスト
         const textElement = (
-            <div className={"card-text"}>
+            <div className={'card-text'}>
                 {this.props.card.text}
             </div>
-        )
+        );
 
         return (
             <div
-                id={"card-" + this.props.card.id}
-                className={"card"}
+                id={'card-' + this.props.card.id}
+                className={'card'}
                 onClick={(e) => {
                     e.stopPropagation();
-                    this.props.dispatch( actions.changePopupMode(POPUP_MODE.EDIT_CARD) );
-                    this.props.dispatch( actions.changeClickTarget({
+                    this.props.dispatch(actions.changePopupMode(POPUP_MODE.EDIT_CARD));
+                    this.props.dispatch(actions.changeClickTarget({
                         listIndex: this.props.listIndex,
-                        cardIndex: this.props.cardIndex
+                        cardIndex: this.props.cardIndex,
                     }));
                 }}
                 onMouseOver={() => {
                     this.setState({
-                        isMouseOver: true
-                    })
+                        isMouseOver: true,
+                    });
                 }}
                 onMouseLeave={() => {
                     this.setState({
-                        isMouseOver: false
-                    })
+                        isMouseOver: false,
+                    });
                 }}
                 >
                 {/* 編集アイコン */}
@@ -200,7 +201,7 @@ class Card extends React.Component<IProps, IState> {
                 {/* テキスト */}
                 {textElement}
             </div>
-        )
+        );
     }
 }
 

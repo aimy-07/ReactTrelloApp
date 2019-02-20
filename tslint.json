@@ -1,10 +1,38 @@
 {
-  "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+  "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier", "tslint-config-airbnb"],
   "linterOptions": {
     "exclude": [
       "config/**/*.js",
       "node_modules/**/*.ts",
       "coverage/lcov-report/*.js"
     ]
+  },
+  "rules": {
+    // consoleメソッドの使用を許可
+    "no-console": false,
+    // importを名前順にしない
+    "ordered-imports": false,
+    // オブジェクトのキーを名前順にしない
+    "object-literal-sort-keys": false,
+    // 1行の文字数制限をしない
+    "max-line-length": false,
+    // インデントは 4 space に指定
+    "ter-indent": [true, 4],
+    // 空行は連続 5 行まで
+    "no-consecutive-blank-lines": [true, 5],
+    // クラスの default import を許可
+    "import-name": false,
+    // 引数への代入を許可
+    "no-parameter-reassignment": false,
+    // 文字列結合にテンプレートリテラル(``)を強制しない
+    "prefer-template": false,
+    // 短縮形のプロパティを通常のプロパティの宣言よりも前に書くことを強制しない
+    "object-shorthand-properties-first": false,
+    // オブジェクトリテラルのキーを文字列にするかしないかの設定を行わない
+    "object-literal-key-quotes": false,
+    // 無名関数をの使用を許可
+    "jsx-no-lambda": false,
+    // アロー関数で引数が一つの時に()を省略可
+    "ter-arrow-parens": false
   }
 }

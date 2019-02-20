@@ -1,12 +1,10 @@
-/* tslint:disable:object-literal-sort-keys no-console jsx-no-lambda jsx-no-bind curly ordered-imports*/
-
-import * as React from "react";
+import * as React from 'react';
 
 
-const colorList = ["#69C666", "#F5DD2A", "#FFB031", "#F57259", "#D38EE4"];
+const colorList = ['#69C666', '#F5DD2A', '#FFB031', '#F57259', '#D38EE4'];
 
 interface IProps {
-    updateLabel: any
+    updateLabel: (newLabel: string) => void;
 }
 
 class LabelList extends React.Component<IProps> {
@@ -15,19 +13,19 @@ class LabelList extends React.Component<IProps> {
         super(props);
         this.state = {
 
-        }
+        };
     }
 
     public render = () => (
         colorList.map(label => (
-            <button 
-                className={"label-btn"}
-                key={"label-btn-" + label}
+            <button
+                className={'label-btn'}
+                key={'label-btn-' + label}
                 onClick={(e: any) => {
-                    this.props.updateLabel(label)
+                    this.props.updateLabel(label);
                     e.stopPropagation();
                 }}
-                style={{backgroundColor: label}}
+                style={{ backgroundColor: label }}
             />
         ))
     )

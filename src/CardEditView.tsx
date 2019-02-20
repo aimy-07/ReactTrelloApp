@@ -1,16 +1,14 @@
-/* tslint:disable: no-console ordered-imports object-literal-sort-keys jsx-no-lambda jsx-no-bind curly*/
-
-import * as React from "react";
-import TextareaAutosize from "react-textarea-autosize";
+import * as React from 'react';
+import TextareaAutosize from 'react-textarea-autosize';
 // react-textarea-autosize デモサイト
 // https://andreypopp.github.io/react-textarea-autosize/
 
-import { Dispatch, AnyAction } from "redux";
-import * as actions from "./actions";
-import { ICard } from "./reducer";
+import { Dispatch, AnyAction } from 'redux';
+import * as actions from './actions';
+import { ICard } from './reducer';
 
-import LabelList from "./LabelList";
-import getElementPosition from "./getElementPosition";
+import LabelList from './LabelList';
+import getElementPosition from './getElementPosition';
 
 
 
@@ -41,7 +39,7 @@ class CardEditView extends React.Component<IProps, IState> {
             newText: props.targetCard.text,
             newLabel: props.targetCard.label,
             isLabelEdit: false,
-        }
+        };
     }
 
 
@@ -50,10 +48,10 @@ class CardEditView extends React.Component<IProps, IState> {
     ---------------------------------- */
     public componentWillReceiveProps = (nextProps: IProps) => {
         if (nextProps !== this.props) {
-            this.setState ({
+            this.setState({
                 newText: nextProps.targetCard.text,
                 newLabel: nextProps.targetCard.label,
-            })
+            });
         }
     }
 
@@ -62,23 +60,23 @@ class CardEditView extends React.Component<IProps, IState> {
         処理関数
     ---------------------------------- */
     public updateCard = (text: string, label: string) => {
-        if (text !== "") {
+        if (text !== '') {
             actions.updateCard(this.props.targetListIndex, this.props.targetCardIndex, text, label);
-            this.props.dispatch( actions.resetPopupMode(null) );
-            this.props.dispatch( actions.resetClickTarget(null) );
+            this.props.dispatch(actions.resetPopupMode(null));
+            this.props.dispatch(actions.resetClickTarget(null));
         }
     }
 
     public deleteCard = () => {
         actions.deleteCard(this.props.targetListIndex, this.props.cards, this.props.targetCardIndex);
-        this.props.dispatch( actions.resetPopupMode(null) );
-        this.props.dispatch( actions.resetClickTarget(null) );
+        this.props.dispatch(actions.resetPopupMode(null));
+        this.props.dispatch(actions.resetClickTarget(null));
     }
 
     public updateLabel = (newLabel: string) => {
         this.setState({
-            newLabel
-        })
+            newLabel,
+        });
     }
 
 
@@ -88,51 +86,51 @@ class CardEditView extends React.Component<IProps, IState> {
     public render(): JSX.Element {
         // ラベル
         const labelElement = (
-            this.state.newLabel !== ""
-            ?   <div 
-                    className={"card-label"}
-                    style={{backgroundColor: this.state.newLabel}}
+            this.state.newLabel !== ''
+            ?   <div
+                    className={'card-label'}
+                    style={{ backgroundColor: this.state.newLabel }}
                 />
             :  null
-        )
+        );
 
         // 保存ボタン
         const saveBtnElement = (
             <button
-                className={"save-btn"}
+                className={'save-btn'}
                 onClick={(e) => {
                     this.updateCard(this.state.newText, this.state.newLabel);
                     this.setState({
-                        newText: "",
-                        newLabel: ""
-                    })
+                        newText: '',
+                        newLabel: '',
+                    });
                     e.stopPropagation();
                 }}
                 >
-                {"   保存   "}
+                {'   保存   '}
             </button>
-        )
+        );
 
         // ラベル編集ボタン
         const editLabelBtnElement = (
             <button
-                id={"edit-side-label-btn-" + this.props.targetCard.id}
-                className={"edit-side-btn"}
+                id={'edit-side-label-btn-' + this.props.targetCard.id}
+                className={'edit-side-btn'}
                 onClick={(e) => {
                     this.setState({
-                        isLabelEdit: !this.state.isLabelEdit
-                    })
+                        isLabelEdit: !this.state.isLabelEdit,
+                    });
                     e.stopPropagation();
                 }}
                 >
                 ラベルを編集
             </button>
-        )
+        );
 
         // 削除ボタン
         const deleteBtnElement = (
             <button
-                className={"edit-side-btn"}
+                className={'edit-side-btn'}
                 onClick={(e: any) => {
                     this.deleteCard();
                     e.stopPropagation();
@@ -140,41 +138,41 @@ class CardEditView extends React.Component<IProps, IState> {
                 >
                 削除
             </button>
-        )
+        );
 
         // ラベル編集メニュー
         const editLabelView = (
-            <div className={"option-menu-container"}
-                style={getElementPosition("edit-side-label-btn-" + this.props.targetCard.id, 0, 32)}
+            <div className={'option-menu-container'}
+                style={getElementPosition('edit-side-label-btn-' + this.props.targetCard.id, 0, 32)}
                 onClick={(e) => {
                     e.stopPropagation();
                 }}>
-                <div style={{position: "absolute"}}>
-                    <button className={"option-menu-cancel-btn"}
+                <div style={{ position: 'absolute' }}>
+                    <button className={'option-menu-cancel-btn'}
                         onClick={(e) => {
                             this.setState({
-                                isLabelEdit: false
-                            })
+                                isLabelEdit: false,
+                            });
                         }}>
                         ×
                     </button>
                 </div>
-                <div className={"option-menu-title"}>
+                <div className={'option-menu-title'}>
                     ラベル
                 </div>
-                <div className={"option-menu-line"}/>
+                <div className={'option-menu-line'}/>
                 <LabelList
                     updateLabel={this.updateLabel}
                     />
             </div>
-        )
+        );
 
         return (
-            <div className={"edit-container"}
-                style={getElementPosition("card-" + this.props.targetCard.id, 0, 0)}>
+            <div className={'edit-container'}
+                style={getElementPosition('card-' + this.props.targetCard.id, 0, 0)}>
 
-                <div style={{display: "block"}}>
-                    <div className={"edit-card"}
+                <div style={{ display: 'block' }}>
+                    <div className={'edit-card'}
                         onClick={(e) => {
                             e.stopPropagation();
                         }}>
@@ -182,12 +180,12 @@ class CardEditView extends React.Component<IProps, IState> {
                         {labelElement}
                         {/* テキストエリア */}
                         <TextareaAutosize
-                            className={"card-input"}
+                            className={'card-input'}
                             value={this.state.newText}
                             onChange={(e) => {
                                 this.setState({
-                                    newText: e.currentTarget.value
-                                })
+                                    newText: e.currentTarget.value,
+                                });
                             }}
                         />
                     </div>
@@ -195,7 +193,7 @@ class CardEditView extends React.Component<IProps, IState> {
                     {saveBtnElement}
                 </div>
 
-                <div style={{display: "block"}}>
+                <div style={{ display: 'block' }}>
                     {/* ラベル編集ボタン */}
                     {editLabelBtnElement}
                     {/* 削除ボタン */}

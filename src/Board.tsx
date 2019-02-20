@@ -1,15 +1,13 @@
-/* tslint:disable: no-console ordered-imports object-literal-sort-keys jsx-no-lambda jsx-no-bind curly*/
+import * as React from 'react';
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 
-import * as React from "react";
-import { DragDropContext } from "react-dnd";
-import HTML5Backend from "react-dnd-html5-backend";
+import { Dispatch, AnyAction } from 'redux';
+import * as actions from './actions';
+import { IList, IClickTarget, INewCard, INewListTitle } from './reducer';
 
-import { Dispatch, AnyAction } from "redux";
-import * as actions from "./actions";
-import { IList, IClickTarget, INewCard, INewListTitle } from "./reducer";
-
-import DraggableList from "./List";
-import AddListButton from "./AddListButton"
+import DraggableList from './List';
+import AddListButton from './AddListButton';
 
 
 
@@ -59,29 +57,29 @@ class Board extends React.Component<IProps> {
         // リスト
         const listElements = (
             this.props.lists !== []
-             ?  this.props.lists.map((list, i) => {
-                    return (
-                        <DraggableList
-                            key={"list-" + list.id}
-                            list={list}
-                            listIndex={i}
-                            popupMode={this.props.popupMode}
-                            clickTarget={this.props.clickTarget}
-                            newCard={this.props.newCard}
-                            newListTitle={this.props.newListTitle}
-                            moveList={this.moveList}
-                            moveCardToList={this.moveCardToList}
-                            moveCard={this.moveCard}
-                            dispatch={this.props.dispatch}
-                        />
-                    )
-                })
-             :  null
-        )
+            ?  this.props.lists.map((list, i) => {
+                return (
+                    <DraggableList
+                        key={'list-' + list.id}
+                        list={list}
+                        listIndex={i}
+                        popupMode={this.props.popupMode}
+                        clickTarget={this.props.clickTarget}
+                        newCard={this.props.newCard}
+                        newListTitle={this.props.newListTitle}
+                        moveList={this.moveList}
+                        moveCardToList={this.moveCardToList}
+                        moveCard={this.moveCard}
+                        dispatch={this.props.dispatch}
+                    />
+                );
+            })
+            :  null
+    );
 
         return (
             <div
-                id={"board"}>
+                id={'board'}>
                 {/* Listコンポーネント */}
                 {listElements}
                 {/* リスト追加ボタン */}
@@ -91,7 +89,7 @@ class Board extends React.Component<IProps> {
                     dispatch={this.props.dispatch}
                     />
             </div>
-        )
+        );
     }
 }
 

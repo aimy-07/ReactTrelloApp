@@ -1,12 +1,10 @@
-/* tslint:disable: no-console ordered-imports object-literal-sort-keys jsx-no-lambda jsx-no-bind curly*/
+import * as React from 'react';
 
-import * as React from "react";
-
-import { Dispatch, AnyAction } from "redux";
-import * as actions from "./actions";
+import { Dispatch, AnyAction } from 'redux';
+import * as actions from './actions';
 import { IList } from './reducer';
 
-import getElementPosition from "./getElementPosition";
+import getElementPosition from './getElementPosition';
 
 
 
@@ -28,7 +26,7 @@ class AddCardMenu extends React.Component<IProps> {
         super(props);
         this.state = {
 
-        }
+        };
     }
 
     /* ---------------------------------
@@ -36,14 +34,14 @@ class AddCardMenu extends React.Component<IProps> {
     ---------------------------------- */
     public deleteList = (listIndex: number) => {
         actions.deleteList(this.props.lists, listIndex);
-        this.props.dispatch( actions.resetPopupMode(null) );
-        this.props.dispatch( actions.resetClickTarget(null) );
+        this.props.dispatch(actions.resetPopupMode(null));
+        this.props.dispatch(actions.resetClickTarget(null));
     }
 
     public deleteAllCards = (listIndex: number) => {
-        actions.deleteAllCards(listIndex)
-        this.props.dispatch( actions.resetPopupMode(null) );
-        this.props.dispatch( actions.resetClickTarget(null) );
+        actions.deleteAllCards(listIndex);
+        this.props.dispatch(actions.resetPopupMode(null));
+        this.props.dispatch(actions.resetClickTarget(null));
     }
 
 
@@ -53,46 +51,46 @@ class AddCardMenu extends React.Component<IProps> {
     public render(): JSX.Element {
         // ×ボタン
         const cancelBtn = (
-            <div style={{position: "absolute"}}>
-                <button className={"option-menu-cancel-btn"}
+            <div style={{ position: 'absolute' }}>
+                <button className={'option-menu-cancel-btn'}
                     onClick={() => {
-                        this.props.dispatch( actions.resetPopupMode(null) );
-                        this.props.dispatch( actions.resetClickTarget(null) );
+                        this.props.dispatch(actions.resetPopupMode(null));
+                        this.props.dispatch(actions.resetClickTarget(null));
                     }}>
                     ×
                 </button>
             </div>
-        )
+        );
 
         return (
-            <div className={"option-menu-container"}
-                style={getElementPosition("list-menu-option-btn-" + this.props.targetList.id, 0, 34)}
+            <div className={'option-menu-container'}
+                style={getElementPosition('list-menu-option-btn-' + this.props.targetList.id, 0, 34)}
                 onClick={(e) => {
                     e.stopPropagation();
                 }}>
-                
+
                 {/* メニュータイトル */}
                 {cancelBtn}
-                <div className={"option-menu-title"}>
+                <div className={'option-menu-title'}>
                     リスト操作
                 </div>
-                <div className={"option-menu-line"}/>
+                <div className={'option-menu-line'}/>
 
                 {/* メニューの中身 */}
-                <button className={"option-menu-btn"}
+                <button className={'option-menu-btn'}
                     onClick={() => {
                         this.deleteAllCards(this.props.targetListIndex);
                     }}>
                     このリストの全てのカードを削除
                 </button>
-                <button className={"option-menu-btn"}
+                <button className={'option-menu-btn'}
                     onClick={() => {
                         this.deleteList(this.props.targetListIndex);
                     }}>
                     このリストを削除
                 </button>
             </div>
-        )
+        );
     }
 }
 
