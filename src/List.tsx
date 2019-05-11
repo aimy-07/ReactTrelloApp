@@ -116,6 +116,7 @@ const DroppableList = DropTarget(
     型宣言
 ---------------------------------- */
 interface IProps {
+    currentUser: firebase.User | null;
     list: IList;
     listIndex: number;
     popupMode: number;
@@ -240,7 +241,7 @@ class List extends React.Component<IProps, IState> {
 
         // カード
         const cardElements = (
-            this.props.list.cards !== undefined
+            this.props.list.cards !== undefined || this.props.list.cards !== null || this.props.list.cards !== []
              ?  this.props.list.cards.map((card, i) => (
                     <DraggableCard
                         key={'card-' + card.id}
@@ -287,6 +288,7 @@ class List extends React.Component<IProps, IState> {
                 {/* 新規追加フォーム */}
                 {this.props.newCard.listIndex === this.props.listIndex
                  ?  <AddCardForm
+                        currentUser={this.props.currentUser}
                         listIndex={this.props.listIndex}
                         listId={this.props.list.id}
                         cards={this.props.list.cards}

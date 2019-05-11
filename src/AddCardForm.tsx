@@ -11,6 +11,7 @@ import { INewCard, POPUP_MODE, ICard } from './reducer';
     型宣言
 ---------------------------------- */
 interface IProps {
+    currentUser: firebase.User | null;
     listIndex: number;
     listId: string;
     cards: ICard[];
@@ -38,8 +39,8 @@ export default class extends React.Component<IProps, IState> {
         処理関数
     ---------------------------------- */
     public addCard = (text: string, label: string) => {
-        if (text !== '') {
-            actions.addCard(this.props.listIndex, this.props.cards, text, label);
+        if (text !== '' && this.props.currentUser !== null) {
+            actions.addCard(this.props.currentUser, this.props.listIndex, this.props.cards, text, label);
             this.cancelAddCard();
         }
     }

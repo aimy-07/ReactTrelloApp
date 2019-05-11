@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { firebaseDb, firebaseAuth } from './util/firebase';
+import { firebaseAuth } from './util/firebase';
 
 import { Dispatch, AnyAction } from 'redux';
 import * as actions from './actions';
@@ -17,12 +17,12 @@ import './App.css';
     型宣言
 ---------------------------------- */
 interface IProps {
+    currentUser: firebase.User;
     board: IBoard;
     popupMode: number;
     clickTarget: IClickTarget;
     newCard: INewCard;
     newListTitle: INewListTitle;
-    currentUser: firebase.User | null;
     dispatch: Dispatch<AnyAction>;
 }
 
@@ -35,25 +35,6 @@ class Page extends React.Component<IProps> {
 
         };
     }
-
-
-    /* ---------------------------------
-        Reactライフサイクル関数
-    ---------------------------------- */
-    public async componentWillMount () {
-        // firebaseからデータ取得
-        await firebaseDb.ref('board/lists').on('value', snapshot => {
-            (async () => {
-                if (snapshot === null) {
-                    console.log('Error : Snapshot is Enpty.');
-                    return;
-                }
-                // console.log(snapshot.val());
-                this.props.dispatch(actions.loadBoardData({ lists: snapshot.val() }));
-            })();
-        });
-    }
-
 
     /* ---------------------------------
         OverView
@@ -117,14 +98,14 @@ class Page extends React.Component<IProps> {
     ---------------------------------- */
     public render(): JSX.Element {
         return (
-            <div
+            <div className={'board-body'}
                 onClick={() => {
                     console.log('背景');
                     // カード追加フォームにテキストがあったら背景クリックで追加
-                    if (this.props.newCard.listIndex !== -1 && this.props.newCard.newText !== '') {
+                    if (this.props.newCard.listIndex !== -1 && this.props.newCard.newText !== '' && this.props.currentUser !== null) {
                         const listIndex = this.props.newCard.listIndex;
                         const cards = this.props.board.lists[listIndex].cards;
-                        actions.addCard(listIndex, cards, this.props.newCard.newText, this.props.newCard.newLabel);
+                        actions.addCard(this.props.currentUser, listIndex, cards, this.props.newCard.newText, this.props.newCard.newLabel);
                     }
                     // リストタイトルが空白でなければ背景クリックでリストタイトルを更新
                     if (this.props.newListTitle.listIndex !== -1 && this.props.newListTitle.newTitle !== '') {
@@ -138,24 +119,9 @@ class Page extends React.Component<IProps> {
                     this.props.dispatch(actions.resetClickTarget(null));
                 }}
                 >
-                {/* ヘッダー */}
-                <div id={'header'}>
-                <div
-                    className="header-text">
-                    React Trello App
-                </div>
-                <button
-                    className="logout-button"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        this.logout();
-                    }}
-                    >
-                    ログアウト
-                </button>
-                </div>
                 {/* ボード */}
                 <Board
+                    currentUser={this.props.currentUser}
                     lists={this.props.board.lists}
                     popupMode={this.props.popupMode}
                     clickTarget={this.props.clickTarget}

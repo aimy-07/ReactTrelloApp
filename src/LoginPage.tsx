@@ -60,6 +60,10 @@ class LoginPage extends React.Component<IProps, IState> {
     public componentDidMount() {
         firebaseAuth.onAuthStateChanged((currentUser: firebase.User | null) => {
             this.props.dispatch(actions.changeUser(currentUser));
+            // ログイン済みだったらHOMEに移動
+            if (currentUser !== null) {
+                this.props.dispatch(actions.changePage(PAGES.HOME));
+            }
         });
     }
 

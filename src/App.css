@@ -22,6 +22,12 @@ textarea {
 /* ---------------------------------
   背景
 ---------------------------------- */
+body, html, #root {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .board-body {
   width: 100%;
   height: 100%;
@@ -29,7 +35,7 @@ textarea {
   overflow: hidden;
 }
 
-#header {
+.header {
   width: 100%;
   text-align: center;
   padding: 10px;

@@ -70,9 +70,8 @@ class AddCardMenu extends React.Component<IProps, IState> {
         return (
             <div className={'option-menu-container'}
                 style={getElementPosition('add-card-option-btn-' + this.props.targetList.id, 0, 34)}
-                onClick={(e) => {
-                    e.stopPropagation();
-                }}>
+                onClick={(e) => e.stopPropagation()}
+                >
 
                 {/* メニュータイトル */}
                 {cancelBtn}

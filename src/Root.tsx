@@ -5,9 +5,9 @@ import * as React from 'react';
 
 import { Dispatch, AnyAction } from 'redux';
 import { IStoreState, PAGES } from './reducer';
-import * as actions from './actions';
+// import * as actions from './actions';
 
-import Page from './Page';
+import Home from './Home';
 import LoginPage from './LoginPage';
 import CreateAccountPage from './CreateAccountPage';
 
@@ -15,48 +15,75 @@ import CreateAccountPage from './CreateAccountPage';
 /* ---------------------------------
     Firebase
 ---------------------------------- */
-// import {firebaseDb} from './util/firebase';
 // データベース初期化
-// firebaseDb.ref('board').set({
-//         lists: [
-//             {
-//                 id: 'list0',
-//                 title: 'TODO',
-//                 createDate: '2019/2/11 12:04:45',
-//                 updateDate: '2019/2/11 12:04:45',
-//                 cards: [
-//                     {
-//                         id: '0000',
-//                         text: 'タスク1',
-//                         label: 'red',
-//                         createDate: '2019/2/11 12:25:51',
-//                         updateDate: '2019/2/11 12:25:51',
-//                     },
-//                     {
-//                         id: '0001',
-//                         text: 'タスク2',
-//                         label: 'blue',
-//                         createDate: '2019/2/11 12:26:35',
-//                         updateDate: '2019/2/11 12:26:35',
-//                     },
-//                 ],
-//             },
-//             {
-//                 id: 'list1',
-//                 title: 'DONE',
-//                 createDate: '2019/2/11 12:04:20',
-//                 updateDate: '2019/2/11 12:04:20',
-//                 cards: [
-//                     {
-//                         id: '0002',
-//                         text: 'タスク3',
-//                         label: 'red',
-//                         createDate: '2019/2/11 12:27:20',
-//                         updateDate: '2019/2/11 12:27:20',
-//                     },
-//                 ],
-//             },
-//         ]
+// import { firebaseDb } from './util/firebase';
+// firebaseDb.ref('boards').set({
+//     ['User:JoUOHpXbv9Qv8jK1bCrvNDdZlqq2']: {
+//         ['Board:board0'] : {
+//             id: 'board0',
+//             lists: [
+//                 {
+//                     id: 'list0',
+//                     title: 'TODO',
+//                     createDate: '2019/2/11 12:04:45',
+//                     updateDate: '2019/2/11 12:04:45',
+//                     cards: [
+//                         {
+//                             id: 'card0',
+//                             text: 'タスク1',
+//                             label: 'red',
+//                             createDate: '2019/2/11 12:25:51',
+//                             updateDate: '2019/2/11 12:25:51',
+//                         },
+//                         {
+//                             id: 'card1',
+//                             text: 'タスク2',
+//                             label: 'blue',
+//                             createDate: '2019/2/11 12:26:35',
+//                             updateDate: '2019/2/11 12:26:35',
+//                         },
+//                     ],
+//                 },
+//                 {
+//                     id: 'list1',
+//                     title: 'DONE',
+//                     createDate: '2019/2/11 12:04:20',
+//                     updateDate: '2019/2/11 12:04:20',
+//                     cards: [
+//                         {
+//                             id: 'card2',
+//                             text: 'タスク3',
+//                             label: 'red',
+//                             createDate: '2019/2/11 12:27:20',
+//                             updateDate: '2019/2/11 12:27:20',
+//                         },
+//                     ],
+//                 },
+//             ],
+//         },
+//     },
+//     ['User:W4mmVFFrVDSWMl5zMFc7VUTo5SD3']: {
+//         ['Board:board0'] : {
+//             id: 'board0',
+//             lists: [
+//                 {
+//                     id: 'list0',
+//                     title: 'New List',
+//                     createDate: '2019/2/11 12:04:20',
+//                     updateDate: '2019/2/11 12:04:20',
+//                     cards: [
+//                         {
+//                             id: 'card0',
+//                             text: 'ようこそ！',
+//                             label: 'red',
+//                             createDate: '2019/2/11 12:27:20',
+//                             updateDate: '2019/2/11 12:27:20',
+//                         },
+//                     ],
+//                 },
+//             ],
+//         },
+//     },
 // });
 // 書き込み
 // set 指定ノード以下全体を更新
@@ -84,55 +111,48 @@ class Root extends React.Component<IProps> {
         };
     }
 
-    public changePage() {
-        if (this.props.currentUser !== null) {
-            this.props.dispatch(actions.changePage(PAGES.BOARD));
-        }
+    /* ---------------------------------
+        レンダリング関数
+    ---------------------------------- */
+    public render(): JSX.Element {
         switch (this.props.currentPage) {
         case PAGES.LOGIN:
+            // 初期ページはLOGIN
+            // LOGINページの ComponentDidMount で既にログイン済みだったら currentPage = HOME に変更
             return (
                 <div className="login-body">
-                <LoginPage
-                    dispatch={this.props.dispatch}
-                    />
+                    <LoginPage
+                        dispatch={this.props.dispatch}
+                        />
                 </div>
             );
         case PAGES.CREATE_ACCOUNT:
             return (
                 <div className="login-body">
-                <CreateAccountPage
-                    dispatch={this.props.dispatch}
-                    />
+                    <CreateAccountPage
+                        dispatch={this.props.dispatch}
+                        />
                 </div>
             );
-        case PAGES.BOARD:
+        // currentUser !== null の時しか表示されない
+        case PAGES.HOME:
+            if (this.props.currentUser === null) {
+                break;
+            }
             return (
-                <div className="board-body">
-                <Page
-                    board={this.props.board}
+                <Home
+                    currentUser={this.props.currentUser}
+                    currentBoardId={this.props.currentBoardId}
+                    boards={this.props.boards}
                     popupMode={this.props.popupMode}
                     clickTarget={this.props.clickTarget}
                     newCard={this.props.newCard}
                     newListTitle={this.props.newListTitle}
-                    // currentPage={this.props.currentPage}
-                    currentUser={this.props.currentUser}
                     dispatch={this.props.dispatch}
                     />
-                </div>
             );
         }
-        return null;
-    }
-
-    /* ---------------------------------
-        レンダリング関数
-    ---------------------------------- */
-    public render(): JSX.Element {
-        return (
-            <div>
-                {this.changePage()}
-            </div>
-        );
+        return <div/>;
     }
 }
 

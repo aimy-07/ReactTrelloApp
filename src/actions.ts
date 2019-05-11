@@ -46,6 +46,10 @@ export const resetNewListTitle = actionCreator<null>(
     'RESET_NEW_LIST_TITLE',
 );
 
+export const changeBoard = actionCreator<string>(
+    'CHANGE_BOARD',
+);
+
 export const changePage = actionCreator<number>(
     'CHANGE_PAGE',
 );
@@ -60,17 +64,19 @@ export const changeUser = actionCreator<firebase.User | null>(
    Firebase Action
 ---------------------------------- */
 // Firebaseロード
-export const loadBoardData = actionCreator<IBoard>(
+export const loadBoardData = actionCreator<IBoard[]>(
     'LOAD_BOARD_DATA',
 );
 
+const boardId = 'board0';
+
 // カードの追加
-export const addCard = (listIndex: number, cards: ICard[], text: string, label:string) => {
+export const addCard = (currentUser: firebase.User, currentBoardId: string, listIndex: number, cards: ICard[], text: string, label:string) => {
     const date = new Date().toLocaleString();
     if (cards === undefined) {
         cards = [];
     }
-    firebaseDb.ref('board/lists/' + listIndex + '/cards').set(cards.concat({
+    firebaseDb.ref('boards/User:' + currentUser.uid + '/Board:' + boardId + '/lists/' + listIndex + '/cards').set(cards.concat({
         id: uuidv4(),
         text,
         label,

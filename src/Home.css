@@ -1,0 +1,99 @@
+/* ---------------------------------
+  初期設定
+---------------------------------- */
+/* デフォルトスタイルを無効にする「appearance: none」 */
+/* https://hacknote.jp/archives/9505/ */
+input, button, textarea, select, div {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+  
+textarea {
+    resize: none;
+}
+  
+*:focus {
+    outline: none;
+}
+
+
+/* ---------------------------------
+  背景
+---------------------------------- */
+body, html {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.home-body {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    overflow: hidden;
+    display: flex;
+}
+
+.home-menu-container {
+    width: 240px;
+    height: 100%;
+    padding: 20px;
+}
+
+.board-list-container {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.home-menu-button {
+    width: 200px;
+    padding: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color: #E9F3F8;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.home-menu-button-text {
+    color: #007DB4;
+    font-weight: bold;
+}
+
+.board-list-title {
+    color: #1A495E;
+    font-weight: bold;
+    margin: 10px;
+}
+
+.board-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.home-board-button {
+    width: 160px;
+    height: 80px;
+    margin: 10px;
+    padding: 10px;
+    background-color: #007DB4;
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-board-button {
+    width: 160px;
+    line-height: 80px;
+    margin: 10px;
+    padding: 10px;
+    background-color: #EBEDEE;
+    color: #90A2AB;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+}

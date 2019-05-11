@@ -30,6 +30,7 @@ export interface IList {
     Boardの型
 ---------------------------------- */
 export interface IBoard {
+    id: string;
     lists: IList[];
 }
 
@@ -46,7 +47,7 @@ export const POPUP_MODE = {
 export const PAGES = {
     LOGIN: 0,
     CREATE_ACCOUNT: 1,
-    BOARD: 2,
+    HOME: 2,
 };
 
 /* ---------------------------------
@@ -74,11 +75,12 @@ export interface INewListTitle {
     Local Storeの型
 ---------------------------------- */
 export interface IStoreState {
-    board: IBoard;
+    boards: IBoard[];
     popupMode: number;
     clickTarget: IClickTarget;
     newCard: INewCard;
     newListTitle: INewListTitle;
+    currentBoardId: string;
     currentPage: number;
     currentUser: firebase.User | null;
 }
@@ -87,9 +89,9 @@ export interface IStoreState {
     Storeの初期状態
 ---------------------------------- */
 export const initialStoreState: IStoreState = {
-    board: {
-        lists: [],
-    },
+    // firebaseから読み込み/更新
+    boards: [],
+    // ローカルステート
     popupMode: POPUP_MODE.NONE,
     clickTarget: {
         listIndex: -1,
@@ -104,6 +106,7 @@ export const initialStoreState: IStoreState = {
         listIndex: -1,
         newTitle: '',
     },
+    currentBoardId: '',
     currentPage: PAGES.LOGIN,
     currentUser: null,
 };
@@ -118,7 +121,7 @@ export default reducerWithInitialState(initialStoreState)
     .case(actions.loadBoardData, (state: IStoreState, payload) => {
         return {
             ...state,
-            board: payload,
+            boards: payload,
         };
     })
 
@@ -193,6 +196,14 @@ export default reducerWithInitialState(initialStoreState)
                 listIndex: -1,
                 newTitle: '',
             },
+        };
+    })
+
+    // Boardの変更
+    .case(actions.changeBoard, (state: IStoreState, payload) => {
+        return {
+            ...state,
+            currentBoardId: payload,
         };
     })
 

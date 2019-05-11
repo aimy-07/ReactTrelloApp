@@ -15,6 +15,7 @@ import AddListButton from './AddListButton';
     型宣言
 ---------------------------------- */
 interface IProps {
+    currentUser: firebase.User | null;
     lists: IList[];
     popupMode: number;
     clickTarget: IClickTarget;
@@ -56,11 +57,12 @@ class Board extends React.Component<IProps> {
     public render(): JSX.Element {
         // リスト
         const listElements = (
-            this.props.lists !== []
+            this.props.lists !== [] || this.props.lists !== undefined || this.props.lists !== null
             ?  this.props.lists.map((list, i) => {
                 return (
                     <DraggableList
                         key={'list-' + list.id}
+                        currentUser={this.props.currentUser}
                         list={list}
                         listIndex={i}
                         popupMode={this.props.popupMode}
